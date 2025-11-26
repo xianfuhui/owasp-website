@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm nhân viên</title>
+</head>
+<body>
+
+<h2>Thêm nhân viên</h2>
+
+<form th:action="@{/employees/add}" th:object="${employee}" method="post">
+
+    Họ tên: <input type="text" th:field="*{fullName}" /><br/><br/>
+    Email: <input type="email" th:field="*{email}" /><br/><br/>
+    SĐT: <input type="text" th:field="*{phone}" /><br/><br/>
+    Chức vụ: <input type="text" th:field="*{position}" /><br/><br/>
+    Lương: <input type="number" th:field="*{salary}" /><br/><br/>
+
+    <button type="submit">Lưu</button>
+</form>
+
+<a href="/employees">Quay lại</a>
+
+</body>
+</html>

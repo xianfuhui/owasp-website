@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tìm kiếm nhân viên</title>
+</head>
+<body>
+
+<h2>Tìm kiếm nhân viên</h2>
+
+<form action="/employees/search-vulnerable" method="get">
+    <input type="text" name="q" placeholder="Search name...">
+    <button type="submit">Search (Vulnerable)</button>
+</form>
+
+<form action="/employees/search-safe" method="get">
+    <input type="text" name="q" placeholder="Search name...">
+    <button type="submit">Search (Safe)</button>
+</form>
+
+<hr>
+
+<table>
+    <tr>
+        <th>Name</th>
+    </tr>
+
+    <tr th:each="e : ${employees}">
+        <td th:text="${e.fullName}"></td>
+    </tr>
+</table>
+
+
+<a href="/employees">Quay lại</a>
+
+</body>
+</html>

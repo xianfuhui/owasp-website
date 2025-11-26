@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee List</title>
+</head>
+<body>
+
+<h2>Danh sách nhân viên</h2>
+
+<a href="/employees/add">+ Thêm nhân viên</a>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Chức vụ</th>
+        <th>Lương</th>
+        <th>Hành động</th>
+    </tr>
+
+    <tr th:each="e : ${employees}">
+        <td th:text="${e.fullName}"></td>
+        <td th:text="${e.email}"></td>
+        <td th:text="${e.phone}"></td>
+        <td th:text="${e.position}"></td>
+        <td th:text="${e.salary}"></td>
+
+        <td>
+            <a th:href="@{/employees/edit/{id}(id=${e.id})}">Sửa</a>
+            |
+            <a th:href="@{/employees/delete/{id}(id=${e.id})}" 
+               onclick="return confirm('Xóa nhân viên?')">Xóa</a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
