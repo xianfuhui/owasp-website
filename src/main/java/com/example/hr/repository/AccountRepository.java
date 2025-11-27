@@ -1,10 +1,8 @@
 package com.example.hr.repository;
 
-import com.example.hr.entity.Account;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import java.util.Optional;
+import com.example.hr.entity.Account;
 
 public interface AccountRepository extends MongoRepository<Account, String> {
-    Optional<Account> findByUsername(String username);
+    Account findByUsername(String username);
 }

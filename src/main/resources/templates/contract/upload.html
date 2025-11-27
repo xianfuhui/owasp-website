@@ -1,0 +1,25 @@
+<h2>Upload Contract File</h2>
+
+<h3 style="color:red;">[[${msg}]]</h3>
+
+<form action="/contracts/upload" method="post" enctype="multipart/form-data">
+    <label>Employee ID:</label>
+    <input type="text" name="employeeId"/>
+
+    <label>Choose PDF:</label>
+    <input type="file" name="file"/>
+
+    <button type="submit">Upload (Secure)</button>
+</form>
+
+<hr/>
+
+<form action="/contracts/upload-vuln" method="post" enctype="multipart/form-data">
+    <label>Employee ID:</label>
+    <input type="text" name="employeeId"/>
+
+    <label>Choose ANY file:</label>
+    <input type="file" name="file"/>
+
+    <button type="submit">Upload (Vulnerable)</button>
+</form>

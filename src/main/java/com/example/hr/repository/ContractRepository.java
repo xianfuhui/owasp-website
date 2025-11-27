@@ -1,5 +1,7 @@
 package com.example.hr.repository;
 
-public class ContractRepository {
-    
+import com.example.hr.entity.ContractFile;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface ContractRepository extends MongoRepository<ContractFile, String> {
 }

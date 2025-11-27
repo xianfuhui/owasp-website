@@ -1,0 +1,25 @@
+<h2>Contract List</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Employee</th>
+        <th>File</th>
+        <th>Download</th>
+    </tr>
+
+    <tr th:each="c : ${contracts}">
+        <td th:text="${c.id}"></td>
+        <td th:text="${c.employeeId}"></td>
+        <td th:text="${c.fileName}"></td>
+        <td>
+            <a th:href="@{/contracts/download/{id}(id=${c.id}, userId='e001', role='ADMIN')}">
+                Download Secure
+            </a>
+            |
+            <a th:href="@{/contracts/download-vuln/{id}(id=${c.id})}">
+                Download Vulnerable
+            </a>
+        </td>
+    </tr>
+</table>

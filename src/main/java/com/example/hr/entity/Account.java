@@ -15,6 +15,7 @@ public class Account {
 
     private int failedAttempts = 0;  // chống brute force
     private boolean locked = false;  // khóa tạm
+    private long lockUntil = 0;
 
     public String getId() {
         return id;
@@ -62,5 +63,13 @@ public class Account {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public long getLockUntil() {
+        return lockUntil;
+    }
+
+    public void setLockUntil(long lockUntil) {
+        this.lockUntil = lockUntil;
     }
 }
