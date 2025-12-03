@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sửa tài khoản</title>
+</head>
+<body>
+
+<h2>Sửa tài khoản</h2>
+
+<form th:action="@{|/accounts/edit/${account.id}|}" th:object="${account}" method="post">
+
+    Username: <input type="text" th:field="*{username}" /><br/><br/>
+
+    Password (để trống nếu không đổi):
+    <input type="password" th:field="*{password}" /><br/><br/>
+
+    Nhân viên:
+    <select name="employeeId">
+        <option th:each="emp : ${employees}"
+                th:value="${emp.id}"
+                th:text="${emp.fullName}"
+                th:selected="${emp.id == account.employeeId}">
+        </option>
+    </select>
+    <br/><br/>
+
+    Role:
+    <select name="role">
+        <option th:each="r : ${roles}"
+                th:value="${r}"
+                th:text="${r}"
+                th:selected="${r == account.role}">
+        </option>
+    </select>
+    <br/><br/>
+
+    <button type="submit">Cập nhật</button>
+</form>
+
+<br/>
+<a href="/accounts/list">Quay lại</a>
+
+</body>
+</html>

@@ -17,7 +17,6 @@ public class NotificationService {
         this.mailSender = mailSender;
     }
 
-
     // ===============================
     // 1) Vulnerable version
     // ===============================
@@ -42,7 +41,6 @@ public class NotificationService {
             return "Error: " + e.getMessage();
         }
     }
-
 
     // ===============================
     // 2) Secure version

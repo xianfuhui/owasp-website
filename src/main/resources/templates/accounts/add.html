@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm tài khoản</title>
+</head>
+<body>
+
+<h2>Thêm tài khoản</h2>
+
+<form th:action="@{/accounts/add}" th:object="${account}" method="post">
+    <div th:if="${errorMessage}" style="color:red">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    Username: <input type="text" th:field="*{username}"/><br/><br/>
+
+    Password: <input type="password" th:field="*{password}"/><br/><br/>
+
+    Nhập ID nhân viên:
+    <input type="text" id="employeeIdInput" name="employeeId"/><br/><br/>
+
+    Tên nhân viên:
+    <input type="text" id="employeeNameDisplay" disabled/><br/><br/>
+
+    Role:
+    <select name="role">
+        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+    </select>
+    <br/><br/>
+
+    <button type="submit">Lưu</button>
+</form>
+
+<script th:inline="javascript">
+    const employees = /*[[${employees}]]*/ [];
+
+    const idInput = document.getElementById('employeeIdInput');
+    const nameDisplay = document.getElementById('employeeNameDisplay');
+
+    idInput.addEventListener('input', function() {
+        const id = this.value.trim();
+
+        const emp = employees.find(e => e.id === id);
+
+        if (emp) {
+            nameDisplay.value = emp.fullName;
+        } else {
+            nameDisplay.value = '';
+        }
+    });
+</script>
+
+<br/>
+<a href="/accounts/list">Quay lại</a>
+
+</body>
+</html>

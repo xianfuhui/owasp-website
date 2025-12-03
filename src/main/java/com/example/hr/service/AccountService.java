@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -23,7 +24,7 @@ public class AccountService implements UserDetailsService {
 
     // Password regex: ít nhất 8 ký tự, chữ hoa, chữ thường, số, ký tự đặc biệt
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
+        Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$");
 
     public AccountService(AccountRepository repo, BCryptPasswordEncoder encoder) {
         this.repo = repo;
@@ -84,26 +85,79 @@ public class AccountService implements UserDetailsService {
         return PASSWORD_PATTERN.matcher(rawPassword).matches();
     }
 
-    // ================= Tạo tài khoản mới =================
-    public String register(String username, String rawPassword) {
-        if (repo.findByUsername(username) != null) {
-            return "Username đã tồn tại!";
-        }
-
-        if (!isPasswordValid(rawPassword)) {
-            return "Password không hợp lệ! Phải ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.";
-        }
-
-        Account acc = new Account();
-        acc.setUsername(username);
-        acc.setPassword(encoder.encode(rawPassword));
-        acc.setRole("USER");
+    public String changePassword(String username, String oldPassword, String newPassword) {
+        Account acc = repo.findByUsername(username);
+        if (acc == null) return "Tài khoản không tồn tại!";
+        if (!encoder.matches(oldPassword, acc.getPassword())) return "Mật khẩu cũ không đúng!";
+        if (!isPasswordValid(newPassword)) return "Mật khẩu mới không hợp lệ!";
+        acc.setPassword(encoder.encode(newPassword));
         repo.save(acc);
-
-        return "Đăng ký thành công!";
+        return "Đổi mật khẩu thành công!";
     }
 
     public Account getByEmployeeId(String employeeId) {
         return repo.findByEmployeeId(employeeId);
+    }
+
+    public Account create(Account acc) {
+
+        if (repo.findByUsername(acc.getUsername()) != null) {
+            throw new RuntimeException("Username đã tồn tại!");
+        }
+
+        if (!isPasswordValid(acc.getPassword())) {
+            throw new RuntimeException(
+                    "Mật khẩu phải tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!"
+            );
+        }
+
+        acc.setPassword(encoder.encode(acc.getPassword()));
+        acc.setFailedAttempts(0);
+        acc.setLocked(false);
+        acc.setLockUntil(0);
+
+        return repo.save(acc);
+    }
+
+    public List<Account> getAll() {
+        return repo.findAll();
+    }
+
+    public Account getById(String id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public Account update(String id, Account newData) {
+        Account oldAcc = repo.findById(id).orElse(null);
+        if (oldAcc == null) return null;
+
+        // Update username nếu có thay đổi
+        if (!oldAcc.getUsername().equals(newData.getUsername())) {
+            if (repo.findByUsername(newData.getUsername()) != null) {
+                throw new RuntimeException("Username đã tồn tại!");
+            }
+            oldAcc.setUsername(newData.getUsername());
+        }
+
+        // Update password nếu có thay đổi
+        if (newData.getPassword() != null && !newData.getPassword().isEmpty()) {
+            if (!isPasswordValid(newData.getPassword())) {
+                throw new RuntimeException(
+                    "Mật khẩu phải tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!"
+                );
+            }
+            oldAcc.setPassword(encoder.encode(newData.getPassword()));
+        }
+
+        // Update role nếu có thay đổi
+        if (newData.getRole() != null) {
+            oldAcc.setRole(newData.getRole());
+        }
+
+        return repo.save(oldAcc);
+    }
+
+    public void delete(String id) {
+        repo.deleteById(id);
     }
 }

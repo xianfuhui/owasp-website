@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chi tiết tài khoản</title>
+</head>
+<body>
+
+<h2>Chi tiết tài khoản</h2>
+
+<p><b>Username:</b> <span th:text="${account.username}"></span></p>
+<p><b>Role:</b> <span th:text="${account.role}"></span></p>
+
+<p><b>Thuộc nhân viên:</b>
+    <span th:if="${employee != null}" th:text="${employee.fullName}"></span>
+    <span th:if="${employee == null}">Không có</span>
+</p>
+
+<p><b>Trạng thái:</b>
+    <span th:if="${account.locked}">Locked</span>
+    <span th:unless="${account.locked}">Active</span>
+</p>
+
+<br/>
+<a th:href="@{|/accounts/edit/${account.id}|}">Sửa</a> |
+<a th:href="@{|/accounts/delete/${account.id}|}"
+   onclick="return confirm('Xóa tài khoản này?')">Xóa</a>
+<br/><br/>
+
+<a href="/accounts/list">Quay lại</a>
+
+</body>
+</html>

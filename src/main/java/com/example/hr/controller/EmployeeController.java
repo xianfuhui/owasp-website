@@ -78,7 +78,7 @@ public class EmployeeController {
             "system"
         );
 
-        return "redirect:/employees";
+        return "redirect:/employees/list";
     }
 
     @GetMapping("/edit/{id}")
@@ -136,6 +136,24 @@ public class EmployeeController {
         Employee emp = service.getById(id);
         model.addAttribute("employee", emp);
         return "employees/detail";
+    }
+
+    @GetMapping("/accounts/{employeeId}")
+    public String accountsOfEmployee(@PathVariable String employeeId, Model model) {
+
+        // Lấy employee
+        Employee emp = service.getById(employeeId);
+        if (emp == null) {
+            return "redirect:/employees/list";
+        }
+
+        // Lấy danh sách account của employee
+        Account acc = accountService.getByEmployeeId(employeeId);
+
+        model.addAttribute("employee", emp);
+        model.addAttribute("account", acc);
+
+        return "employees/accounts"; // view mới
     }
 
     @GetMapping("/search")

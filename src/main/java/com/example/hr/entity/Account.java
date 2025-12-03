@@ -13,7 +13,7 @@ public class Account {
 
     private String username;
     private String password;   // bcrypt hashed
-    private String role;       // "USER" hoặc "ADMIN"
+    private String role;       // "USER" "HR" "ADMIN"
 
     private int failedAttempts = 0;  // chống brute force
     private boolean locked = false;  // khóa tạm

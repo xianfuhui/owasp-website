@@ -9,8 +9,6 @@ public class Employee {
     @Id
     private String id;
 
-    private String accountId;
-
     private String fullName;
     private String email;
     private String phone;
@@ -21,9 +19,6 @@ public class Employee {
     // Getter & Setter
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
-    public String getAccountId() { return accountId; }
-    public void setAccountId(String accountId) { this.accountId = accountId; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

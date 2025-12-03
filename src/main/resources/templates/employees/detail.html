@@ -13,11 +13,11 @@
     <p><strong>Chức vụ:</strong> <span th:text="${employee.position}"></span></p>
     <p><strong>Lương:</strong> <span th:text="${employee.salary}"></span></p>
 
-    <!-- <div>
+    <div>
         <img th:if="${employee.avatarPath != null}"
              th:src="@{${employee.avatarPath}}"
              alt="Avatar" width="120">
-    </div> -->
+    </div>
 
     <a th:href="@{/employees}">Quay lại</a>
 </div>

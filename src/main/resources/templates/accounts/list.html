@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách tài khoản</title>
+</head>
+<body>
+
+<h2>Danh sách tài khoản</h2>
+
+<a href="/accounts/add">+ Thêm tài khoản</a>
+<br/><br/>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Employee</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+    </tr>
+
+    <tr th:each="acc : ${accounts}">
+        <td th:text="${acc.username}"></td>
+        <td th:text="${acc.role}"></td>
+        <td th:text="${acc.employeeId}"></td>
+
+        <td>
+            <span th:if="${acc.locked}">Locked</span>
+            <span th:unless="${acc.locked}">Active</span>
+        </td>
+
+        <td>
+            <a th:href="@{|/accounts/detail/${acc.id}|}">Chi tiết</a> |
+            <a th:href="@{|/accounts/edit/${acc.id}|}">Sửa</a> |
+            <a th:href="@{|/accounts/delete/${acc.id}|}"
+               onclick="return confirm('Xóa tài khoản này?')">Xóa</a>
+        </td>
+    </tr>
+
+</table>
+
+<br/>
+<a href="/home">Về trang chủ</a>
+
+</body>
+</html>

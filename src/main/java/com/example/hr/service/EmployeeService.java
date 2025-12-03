@@ -1,8 +1,6 @@
 package com.example.hr.service;
 
-import com.example.hr.entity.Account;
 import com.example.hr.entity.Employee;
-import com.example.hr.repository.AccountRepository;
 import com.example.hr.repository.EmployeeRepository;
 import com.example.hr.repository.EmployeeSearchRepository;
 
@@ -16,14 +14,12 @@ import java.util.Optional;
 public class EmployeeService {
 
     private final EmployeeRepository repo;
-    private final AccountRepository accountRepo;
 
     @Autowired
     private EmployeeSearchRepository searchRepository;
 
-    public EmployeeService(EmployeeRepository repo, AccountRepository accountRepo) {
+    public EmployeeService(EmployeeRepository repo) {
         this.repo = repo;
-        this.accountRepo = accountRepo;
     }
 
     public List<Employee> getAll() {
@@ -51,17 +47,6 @@ public class EmployeeService {
         emp.setSalary(newData.getSalary());
 
         Employee updated = repo.save(emp);
-
-        if (emp.getAccountId() != null) {
-
-            // Tìm account bằng employeeId
-            Account acc = accountRepo.findByEmployeeId(emp.getId());
-
-            if (acc != null) {
-                acc.setRole(role);
-                accountRepo.save(acc);
-            }
-        }
 
         return updated;
     }
