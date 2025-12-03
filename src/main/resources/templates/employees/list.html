@@ -31,6 +31,10 @@
             |
             <a th:href="@{/employees/delete/{id}(id=${e.id})}" 
                onclick="return confirm('Xóa nhân viên?')">Xóa</a>
+            |
+            <a th:href="@{'/employees/detail/' + ${e.id}}">Xem</a>
+            |
+            <a th:href="@{/contracts/employee/{id}(id=${e.id})}">Xem hợp đồng</a>
         </td>
     </tr>
 </table>

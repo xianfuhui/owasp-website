@@ -1,33 +1,29 @@
 package com.example.hr.service;
 
-import com.example.hr.entity.ContractFile;
+import com.example.hr.entity.Contract;
 import com.example.hr.repository.ContractRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 
 @Service
 public class ContractService {
 
-    @Autowired
-    private ContractRepository repo;
+    private final ContractRepository repo;
 
-    // Vulnerable
-    public byte[] downloadVulnerable(String contractId) {
-        try {
-            ContractFile file = repo.findById(contractId).orElseThrow();
+    public ContractService(ContractRepository repo) {
+        this.repo = repo;
+    }
 
-            // Không kiểm tra quyền
-            // Không kiểm tra đường dẫn
-            // Không mã hóa file → đọc từ file trực tiếp
-            Path p = Path.of(file.getFilePath());
+    public List<Contract> getByEmployee(String employeeId) {
+        return repo.findByEmployeeId(employeeId);
+    }
 
-            return Files.readAllBytes(p);
+    public Contract save(Contract file) {
+        return repo.save(file);
+    }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Download error: " + e.getMessage());
-        }
+    public Contract getById(String id) {
+        return repo.findById(id).orElse(null);
     }
 }

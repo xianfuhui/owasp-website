@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "contracts")
-public class ContractFile {
+public class Contract {
 
     @Id
     private String id;
@@ -13,9 +13,9 @@ public class ContractFile {
     private String fileName;        // tên file gốc
     private String filePath;        // đường dẫn file thực tế trên server
 
-    public ContractFile() {}
+    public Contract() {}
 
-    public ContractFile(String id, String employeeId, String fileName, String filePath) {
+    public Contract(String id, String employeeId, String fileName, String filePath) {
         this.id = id;
         this.employeeId = employeeId;
         this.fileName = fileName;

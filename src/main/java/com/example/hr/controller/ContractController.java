@@ -1,150 +1,125 @@
 package com.example.hr.controller;
 
-import com.example.hr.service.ContractService;
-import com.example.hr.entity.ContractFile;
+import com.example.hr.entity.Contract;
 import com.example.hr.repository.ContractRepository;
-import com.example.hr.service.ContractSecureService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+@Controller
 @RequestMapping("/contracts")
 public class ContractController {
 
-    @Autowired
-    private ContractService vulnerable;
+    private final ContractRepository repo;
 
-    @Autowired
-    private ContractSecureService secure;
-
-    @Autowired
-    private ContractRepository repo;
-
-    // VULNERABLE
-    @GetMapping("/download-vuln/{id}")
-    public void downloadVuln(@PathVariable String id, HttpServletResponse response) throws Exception {
-        byte[] data = vulnerable.downloadVulnerable(id);
-
-        response.setContentType("application/pdf");
-        response.getOutputStream().write(data);
+    public ContractController(ContractRepository repo) {
+        this.repo = repo;
     }
 
-    // SECURE
+    // 1) List hợp đồng theo employeeId
+    @GetMapping("/employee/{employeeId}")
+    public String listByEmployee(@PathVariable String employeeId, Model model) {
+
+        List<Contract> files = repo.findByEmployeeId(employeeId);
+
+        model.addAttribute("contracts", files);
+        model.addAttribute("employeeId", employeeId);
+
+        return "contracts/list";
+    }
+
+    // 2) Upload file
+    @PostMapping("/upload/{employeeId}")
+    public String uploadContract(@PathVariable String employeeId,
+                                 @RequestParam("file") MultipartFile file) throws IOException {
+
+        if (file.isEmpty()) {
+            return "redirect:/contracts/employee/" + employeeId + "?error=empty";
+        }
+
+        String uploadDir = "uploads/contracts/" + employeeId;
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String filePath = Paths.get(uploadDir, file.getOriginalFilename()).toAbsolutePath().toString();
+        file.transferTo(new File(filePath));
+
+        Contract contract = new Contract();
+        contract.setEmployeeId(employeeId);
+        contract.setFileName(file.getOriginalFilename());
+        contract.setFilePath(filePath);
+        repo.save(contract);
+
+        return "redirect:/contracts/employee/" + employeeId + "?success=uploaded";
+    }
+
+    // 3) Download file
     @GetMapping("/download/{id}")
-    public void downloadSecure(@PathVariable String id,
-                               @RequestParam String userId,
-                               @RequestParam String role,
-                               HttpServletResponse response) throws Exception {
+    public ResponseEntity<FileSystemResource> downloadContract(@PathVariable String id) throws IOException {
+        Contract contract = repo.findById(id).orElseThrow(() -> new RuntimeException("Contract not found"));
+        File file = new File(contract.getFilePath());
 
-        byte[] data = secure.downloadSecure(id, userId, role);
-
-        response.setContentType("application/pdf");
-        response.getOutputStream().write(data);
-    }
-
-    // ========================
-    // VULNERABLE UPLOAD (A08)
-    // ========================
-    @PostMapping("/upload-vuln")
-    public String uploadVulnerable(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("employeeId") String employeeId,
-                                   Model model) {
-        try {
-            // Không kiểm tra loại file
-            // Không giới hạn folder
-            // Không xác thực ai đang upload
-
-            Path folder = Path.of("uploads/contracts/");
-            Files.createDirectories(folder);
-
-            Path savePath = folder.resolve(file.getOriginalFilename());
-            Files.copy(file.getInputStream(), savePath);
-
-            repo.save(new ContractFile(
-                    UUID.randomUUID().toString(),
-                    employeeId,
-                    file.getOriginalFilename(),
-                    savePath.toString()
-            ));
-
-            model.addAttribute("msg", "Vulnerable file uploaded");
-            return "contract/upload";
-
-        } catch (Exception e) {
-            throw new RuntimeException("Upload error: " + e.getMessage());
-        }
-    }
-
-
-    // ========================
-    // SECURE UPLOAD
-    // ========================
-    @PostMapping("/upload")
-    public String uploadSecure(@RequestParam("file") MultipartFile file,
-                               @RequestParam("employeeId") String employeeId,
-                               HttpSession session,
-                               Model model) {
-        try {
-            // 1) Kiểm tra đăng nhập
-            String role = (String) session.getAttribute("role");
-            if (role == null) {
-                throw new SecurityException("Not logged in");
-            }
-
-            // 2) Chỉ admin mới được upload hợp đồng
-            if (!role.equals("ADMIN")) {
-                throw new SecurityException("Access denied");
-            }
-
-            // 3) Kiểm tra MIME-Type
-            if (!file.getContentType().equals("application/pdf")) {
-                throw new SecurityException("Only PDF allowed");
-            }
-
-            // 4) Chỉ lưu vào thư mục hợp lệ
-            Path folder = Path.of("secure/contracts/");
-            Files.createDirectories(folder);
-
-            Path savePath = folder.resolve(UUID.randomUUID().toString() + ".pdf");
-            Files.copy(file.getInputStream(), savePath);
-
-            repo.save(new ContractFile(
-                    UUID.randomUUID().toString(),
-                    employeeId,
-                    file.getOriginalFilename(),
-                    savePath.toString()
-            ));
-
-            model.addAttribute("msg", "Secure upload OK");
-            return "contract/upload";
-
-        } catch (Exception e) {
-            model.addAttribute("msg", "Error: " + e.getMessage());
-            return "contract/upload";
-        }
-    }
-
-    @GetMapping
-    public String list(Model model, HttpSession session) {
-
-        // Chỉ admin xem tất cả hợp đồng
-        String role = (String) session.getAttribute("role");
-
-        if (!"ADMIN".equals(role)) {
-            model.addAttribute("contracts", repo.findAll()); // cho demo, không secure
-        } else {
-            model.addAttribute("contracts", repo.findAll());
+        if (!file.exists()) {
+            throw new RuntimeException("File not found: " + contract.getFilePath());
         }
 
-        return "contract/list";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + contract.getFileName() + "\"")
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new FileSystemResource(file));
+    }
+
+    // 4) Delete file
+    @GetMapping("/delete/{id}")
+    public String deleteContract(@PathVariable String id) {
+        Contract contract = repo.findById(id).orElseThrow(() -> new RuntimeException("Contract not found"));
+        File file = new File(contract.getFilePath());
+
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            System.out.println("Deleted file: " + file.getAbsolutePath() + " -> " + deleted);
+        }
+
+        repo.delete(contract);
+        return "redirect:/contracts/employee/" + contract.getEmployeeId() + "?success=deleted";
+    }
+
+    // 5) View file trực tiếp trên web
+    @GetMapping("/view/{id}")
+    public ResponseEntity<FileSystemResource> viewContract(@PathVariable String id) throws IOException {
+        Contract contract = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract not found"));
+        File file = new File(contract.getFilePath());
+
+        if (!file.exists()) {
+            throw new RuntimeException("File not found: " + contract.getFilePath());
+        }
+
+        // Xác định type dựa trên extension (ở đây ví dụ PDF, hình ảnh)
+        String contentType = Files.probeContentType(file.toPath());
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + contract.getFileName() + "\"")
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(new FileSystemResource(file));
     }
 }

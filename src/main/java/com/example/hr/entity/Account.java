@@ -9,6 +9,8 @@ public class Account {
     @Id
     private String id;
 
+    private String employeeId;
+
     private String username;
     private String password;   // bcrypt hashed
     private String role;       // "USER" hoặc "ADMIN"
@@ -24,6 +26,9 @@ public class Account {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getEmployeeId() { return employeeId; }
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
 
     public String getUsername() {
         return username;

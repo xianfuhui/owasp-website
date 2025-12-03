@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Send Safe</title></head>
+<body>
+<h2>Gửi mail (Secure)</h2>
+
+<form method="post" action="/notify/send-safe">
+    <label>Email nhận:</label><br>
+    <input type="email" name="to" required><br><br>
+
+    <label>Subject:</label><br>
+    <input type="text" name="subject" required><br><br>
+
+    <label>Message:</label><br>
+    <textarea name="message" required></textarea><br><br>
+
+    <button type="submit">Gửi an toàn</button>
+</form>
+
+</body>
+</html>

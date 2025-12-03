@@ -8,14 +8,26 @@
 
 <h2>Sửa nhân viên</h2>
 
-<form th:action="@{/employees/edit/{id}(id=${employee.id})}" 
+<form th:action="@{/employees/edit/{id}(id=${employee.id})}"
       th:object="${employee}" method="post">
+
+    <input type="hidden" th:if="${employee.accountId != null}" th:field="*{accountId}" />
 
     Họ tên: <input type="text" th:field="*{fullName}" /><br/><br/>
     Email: <input type="email" th:field="*{email}" /><br/><br/>
     SĐT: <input type="text" th:field="*{phone}" /><br/><br/>
     Chức vụ: <input type="text" th:field="*{position}" /><br/><br/>
     Lương: <input type="number" th:field="*{salary}" /><br/><br/>
+
+    Quyền tài khoản:
+    <select name="role">
+        <option th:each="r : ${roles}"
+                th:value="${r}"
+                th:text="${r}"
+                th:selected="${account != null} ? ${r.equals(account.role)} : false">
+        </option>
+    </select>
+    <br/><br/>
 
     <button type="submit">Cập nhật</button>
 </form>

@@ -102,4 +102,8 @@ public class AccountService implements UserDetailsService {
 
         return "Đăng ký thành công!";
     }
+
+    public Account getByEmployeeId(String employeeId) {
+        return repo.findByEmployeeId(employeeId);
+    }
 }

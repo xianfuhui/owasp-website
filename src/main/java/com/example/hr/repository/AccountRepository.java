@@ -5,4 +5,5 @@ import com.example.hr.entity.Account;
 
 public interface AccountRepository extends MongoRepository<Account, String> {
     Account findByUsername(String username);
+    Account findByEmployeeId(String employeeId);
 }

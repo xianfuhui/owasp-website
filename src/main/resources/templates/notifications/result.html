@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Result</title></head>
+<body>
+<h2>Kết quả</h2>
+
+<p th:text="${status}"></p>
+
+<a href="/notify/send-safe">Gửi lại (safe)</a><br>
+<a href="/notify/send-vulnerable">Gửi lại (vulnerable)</a>
+
+</body>
+</html>

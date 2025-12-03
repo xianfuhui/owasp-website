@@ -42,7 +42,7 @@ public class SecurityConfig {
 
         // LOGOUT
         http.logout(logout -> logout
-                .logoutUrl("/doLogout")
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
