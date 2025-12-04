@@ -1,7 +1,10 @@
 package com.example.hr.service;
 
 import com.example.hr.entity.Account;
+import com.example.hr.entity.Employee;
 import com.example.hr.repository.AccountRepository;
+
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,53 +34,60 @@ public class AccountService implements UserDetailsService {
         this.encoder = encoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account acc = repo.findByUsername(username);
-        if (acc == null) throw new UsernameNotFoundException("User not found");
-
-        return User.builder()
-                .username(acc.getUsername())
-                .password(acc.getPassword())
-                .accountLocked(acc.isLocked())
-                .roles(acc.getRole())
-                .build();
-    }
-
     // ================= Đăng nhập kiểm soát brute-force =================
-    public String login(String username, String rawPassword) {
+    public void recordFailedAttempt(String username) {
         Account acc = repo.findByUsername(username);
-        if (acc == null) return "Sai tài khoản hoặc mật khẩu!";
+        if (acc == null) return;
 
         long now = System.currentTimeMillis();
 
-        // Kiểm tra khóa
+        acc.setFailedAttempts(acc.getFailedAttempts() + 1);
+
+        if (acc.getFailedAttempts() >= MAX_ATTEMPTS) {
+            acc.setLocked(true);
+            acc.setLockUntil(now + LOCK_DURATION);
+        }
+        repo.save(acc);
+    }
+
+    public void resetAttempts(String username) {
+        Account acc = repo.findByUsername(username);
+        if (acc == null) return;
+
+        acc.setFailedAttempts(0);
+        acc.setLocked(false);
+        acc.setLockUntil(0);
+        repo.save(acc);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        Account acc = repo.findByUsername(username);
+        if (acc == null) throw new UsernameNotFoundException("User not found");
+
+        long now = System.currentTimeMillis();
+
+        System.out.println("Locked: " + acc.isLocked());
+        System.out.println("LockUntil: " + acc.getLockUntil());
+        System.out.println("Now: " + System.currentTimeMillis());
+
         if (acc.isLocked() && now < acc.getLockUntil()) {
-            return "Tài khoản bị khóa tạm thời. Thử lại sau!";
+            throw new LockedException("Account locked temporarily");
         }
 
         if (acc.isLocked() && now >= acc.getLockUntil()) {
             acc.setLocked(false);
             acc.setFailedAttempts(0);
-        }
-
-        // Kiểm tra mật khẩu
-        if (!encoder.matches(rawPassword, acc.getPassword())) {
-            acc.setFailedAttempts(acc.getFailedAttempts() + 1);
-            if (acc.getFailedAttempts() >= MAX_ATTEMPTS) {
-                acc.setLocked(true);
-                acc.setLockUntil(now + LOCK_DURATION);
-            }
             repo.save(acc);
-            return "Sai mật khẩu!";
         }
 
-        // Đăng nhập thành công
-        acc.setFailedAttempts(0);
-        acc.setLocked(false);
-        repo.save(acc);
-
-        return "Đăng nhập thành công! Role: " + acc.getRole();
+        return User.builder()
+                    .username(acc.getUsername())
+                    .password(acc.getPassword())
+                    .accountLocked(acc.isLocked())
+                    .roles(acc.getRole())
+                    .build();
     }
 
     // ================= Validate password khi đăng ký =================
@@ -159,5 +169,9 @@ public class AccountService implements UserDetailsService {
 
     public void delete(String id) {
         repo.deleteById(id);
+    }
+
+    public Account getByUsername(String username) {
+        return repo.findByUsername(username);
     }
 }

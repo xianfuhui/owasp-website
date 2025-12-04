@@ -8,6 +8,9 @@ import com.example.hr.service.ActivityLogService;
 
 import java.util.List;
 
+import com.example.hr.util.AccessControlUtil;
+import com.example.hr.util.SecurityUtil;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -132,9 +135,17 @@ public class EmployeeController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable String id, Model model) {
+    public String getEmployeeDetail(@PathVariable String id, Model model) {
+
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        Account currentAccount = accountService.getByUsername(currentUsername);
+
+        // Kiểm tra quyền: ADMIN/HR xem tất cả, USER chỉ xem chính mình
+        AccessControlUtil.checkViewOrDownload(currentAccount, id);
+
         Employee emp = service.getById(id);
         model.addAttribute("employee", emp);
+
         return "employees/detail";
     }
 

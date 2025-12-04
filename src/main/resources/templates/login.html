@@ -17,8 +17,18 @@
     <button type="submit">Đăng nhập</button>
 </form>
 
-<div th:if="${param.error}">Sai mật khẩu hoặc tài khoản bị khóa.</div>
-<div th:if="${param.logout}">Đăng xuất thành công.</div>
+<div th:if="${param.locked}">
+    Tài khoản đã nhập sai quá số lần. Tạm khóa, vui lòng thử lại sau.
+</div>
+
+<div th:if="${param.badpass}">
+    Mật khẩu không đúng.
+</div>
+
+<div th:if="${param.error}">
+    Đã xảy ra lỗi đăng nhập.
+</div>
+
 
 </body>
 </html>

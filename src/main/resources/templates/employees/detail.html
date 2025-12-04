@@ -15,7 +15,7 @@
 
     <div>
         <img th:if="${employee.avatarPath != null}"
-             th:src="@{${employee.avatarPath}}"
+             th:src="@{'/' + ${employee.avatarPath}}"
              alt="Avatar" width="120">
     </div>
 
