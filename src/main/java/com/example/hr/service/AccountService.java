@@ -1,7 +1,6 @@
 package com.example.hr.service;
 
 import com.example.hr.entity.Account;
-import com.example.hr.entity.Employee;
 import com.example.hr.repository.AccountRepository;
 
 import org.springframework.security.authentication.LockedException;

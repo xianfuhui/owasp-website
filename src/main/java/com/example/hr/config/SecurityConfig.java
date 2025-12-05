@@ -22,7 +22,15 @@ public class SecurityConfig {
 
                 http.csrf().disable();
 
-                http.authorizeHttpRequests(auth -> auth
+                http
+                //-------------
+                //A02
+                //-------------
+                // .requiresChannel(channel ->
+                //         channel.anyRequest().requiresSecure()
+                // )
+                //-------------
+                .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/login", "/register").permitAll()
                                 .requestMatchers("/css/**", "/js/**").permitAll()
                                 .requestMatchers("/employees/detail/**").hasAnyRole("ADMIN", "HR", "USER")
