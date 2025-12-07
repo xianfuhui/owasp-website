@@ -1,6 +1,7 @@
 package com.example.hr.controller;
 
 import com.example.hr.service.AvatarService;
+import com.example.hr.service.EmployeeService;
 import com.example.hr.util.SecurityUtil;
 
 import org.slf4j.Logger;
@@ -20,8 +21,12 @@ public class AvatarController {
     @Autowired
     private AvatarService avatarService;
 
+    @Autowired
+    private EmployeeService employeeService;
+
     @GetMapping("/upload-avatar")
-    public String showUploadForm() {
+    public String showUploadForm(Model model) {
+        model.addAttribute("employees", employeeService.getAll());
         return "employees/avatars/upload-avatar";
     }
 

@@ -184,12 +184,12 @@
                     <h2 class="form-section-title">Liên kết nhân viên</h2>
 
                     <div class="form-group">
-                        <label for="employeeIdInput" class="form-label required">ID nhân viên</label>
+                        <label for="employeeId" class="form-label required">ID nhân viên</label>
                         <div style="position: relative;">
                             <img th:src="@{/icons/user.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
                             <input 
                                 type="text" 
-                                id="employeeIdInput"
+                                id="employeeId"
                                 name="employeeId" 
                                 class="form-control" 
                                 style="padding-left: 3rem;"
@@ -246,7 +246,7 @@
 
     <script th:inline="javascript">
         const employees = /*[[${employees}]]*/ [];
-        const idInput = document.getElementById('employeeIdInput');
+        const idInput = document.getElementById('employeeId');
         const preview = document.getElementById('employeePreview');
         const avatar = document.getElementById('employeeAvatar');
         const name = document.getElementById('employeeName');
