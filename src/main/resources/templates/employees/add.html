@@ -1,25 +1,216 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Thêm nhân viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm nhân viên - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+        }
+
+        .form-card {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Thêm nhân viên</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<form th:action="@{/employees/add}" th:object="${employee}" method="post">
+    <div class="container page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <img th:src="@{/icons/plus.svg}" alt="" class="icon">
+                <span>Thêm nhân viên mới</span>
+            </h1>
+            <div class="breadcrumb">
+                <a th:href="@{/home}">Trang chủ</a>
+                <span>/</span>
+                <a th:href="@{/employees/list}">Nhân viên</a>
+                <span>/</span>
+                <span>Thêm mới</span>
+            </div>
+        </div>
 
-    Họ tên: <input type="text" th:field="*{fullName}" /><br/><br/>
-    Email: <input type="email" th:field="*{email}" /><br/><br/>
-    SĐT: <input type="text" th:field="*{phone}" /><br/><br/>
-    Chức vụ: <input type="text" th:field="*{position}" /><br/><br/>
-    Lương: <input type="number" th:field="*{salary}" /><br/><br/>
+        <div class="card form-card">
+            <form th:action="@{/employees/add}" th:object="${employee}" method="post">
+                <div class="form-section">
+                    <h2 class="form-section-title">Thông tin cá nhân</h2>
 
-    <button type="submit">Lưu</button>
-</form>
+                    <div class="form-group">
+                        <label for="fullName" class="form-label required">Họ và tên</label>
+                        <input 
+                            type="text" 
+                            id="fullName"
+                            th:field="*{fullName}" 
+                            class="form-control" 
+                            placeholder="Nhập họ và tên đầy đủ"
+                            required
+                        />
+                        <span class="form-help">Vui lòng nhập họ và tên đầy đủ của nhân viên</span>
+                    </div>
 
-<a href="/employees">Quay lại</a>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="email" class="form-label required">Email</label>
+                                <div style="position: relative;">
+                                    <img th:src="@{/icons/mail.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                                    <input 
+                                        type="email" 
+                                        id="email"
+                                        th:field="*{email}" 
+                                        class="form-control" 
+                                        style="padding-left: 3rem;"
+                                        placeholder="email@example.com"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label required">Số điện thoại</label>
+                                <div style="position: relative;">
+                                    <img th:src="@{/icons/phone.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                                    <input 
+                                        type="text" 
+                                        id="phone"
+                                        th:field="*{phone}" 
+                                        class="form-control" 
+                                        style="padding-left: 3rem;"
+                                        placeholder="0123456789"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div th:replace="~{fragments/messages :: messages}"></div>
+                <div class="form-section">
+                    <h2 class="form-section-title">Thông tin công việc</h2>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="position" class="form-label required">Chức vụ</label>
+                                <div style="position: relative;">
+                                    <img th:src="@{/icons/briefcase.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                                    <input 
+                                        type="text" 
+                                        id="position"
+                                        th:field="*{position}" 
+                                        class="form-control" 
+                                        style="padding-left: 3rem;"
+                                        placeholder="Ví dụ: Developer, Manager..."
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="salary" class="form-label required">Lương (VNĐ)</label>
+                                <div style="position: relative;">
+                                    <img th:src="@{/icons/dollar-sign.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-success);">
+                                    <input 
+                                        type="number" 
+                                        id="salary"
+                                        th:field="*{salary}" 
+                                        class="form-control" 
+                                        style="padding-left: 3rem;"
+                                        placeholder="10000000"
+                                        min="0"
+                                        step="100000"
+                                        required
+                                    />
+                                </div>
+                                <span class="form-help">Nhập mức lương cơ bản hàng tháng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/employees/list}" class="btn btn-outline">
+                        <span>Hủy bỏ</span>
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <img th:src="@{/icons/check.svg}" alt="" class="icon">
+                        <span>Lưu nhân viên</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
 </body>
 </html>

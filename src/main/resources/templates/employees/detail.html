@@ -1,29 +1,390 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Chi tiết nhân viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết nhân viên - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+        }
+
+        .profile-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            box-shadow: var(--shadow-xl);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9375rem;
+            opacity: 0.95;
+        }
+
+        .profile-meta-item .icon {
+            width: 1.125rem;
+            height: 1.125rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .info-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .info-card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .info-card-title .icon {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .info-card-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .detail-section {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .detail-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .detail-row {
+            display: flex;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            flex: 0 0 200px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .detail-label .icon {
+            width: 1.125rem;
+            height: 1.125rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--color-text-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+
+            .detail-label {
+                flex: none;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Thông tin nhân viên</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div>
-    <p><strong>ID:</strong> <span th:text="${employee.id}"></span></p>
-    <p><strong>Họ tên:</strong> <span th:text="${employee.fullName}"></span></p>
-    <p><strong>Email:</strong> <span th:text="${employee.email}"></span></p>
-    <p><strong>Số điện thoại:</strong> <span th:text="${employee.phone}"></span></p>
-    <p><strong>Chức vụ:</strong> <span th:text="${employee.position}"></span></p>
-    <p><strong>Lương:</strong> <span th:text="${employee.salary}"></span></p>
+    <div class="container page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                <span>Thông tin nhân viên</span>
+            </h1>
+            <div class="breadcrumb">
+                <a th:href="@{/home}">Trang chủ</a>
+                <span>/</span>
+                <a th:href="@{/employees/list}">Nhân viên</a>
+                <span>/</span>
+                <span>Chi tiết</span>
+            </div>
+        </div>
 
-    <div>
-        <img th:if="${employee.avatarPath != null}"
-             th:src="@{'/' + ${employee.avatarPath}}"
-             alt="Avatar" width="120">
+        <div class="profile-container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img th:if="${employee.avatarPath != null}"
+                         th:src="@{'/' + ${employee.avatarPath}}"
+                         alt="Avatar">
+                    <span th:if="${employee.avatarPath == null}" th:text="${#strings.substring(employee.fullName, 0, 1)}">A</span>
+                </div>
+                <div class="profile-info">
+                    <h1 th:text="${employee.fullName}">Nguyễn Văn A</h1>
+                    <div class="profile-meta">
+                        <div class="profile-meta-item">
+                            <img th:src="@{/icons/briefcase.svg}" alt="" class="icon">
+                            <span th:text="${employee.position}">Developer</span>
+                        </div>
+                        <div class="profile-meta-item">
+                            <img th:src="@{/icons/mail.svg}" alt="" class="icon">
+                            <span th:text="${employee.email}">email@example.com</span>
+                        </div>
+                        <div class="profile-meta-item">
+                            <img th:src="@{/icons/phone.svg}" alt="" class="icon">
+                            <span th:text="${employee.phone}">0123456789</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <img th:src="@{/icons/dollar-sign.svg}" alt="" class="icon">
+                        <span>Lương cơ bản</span>
+                    </div>
+                    <div class="info-card-value" style="color: var(--color-success);">
+                        <span th:text="${#numbers.formatDecimal(employee.salary, 0, 'COMMA', 0, 'POINT')}">10,000,000</span> VNĐ
+                    </div>
+                </div>
+
+                <div class="info-card" style="border-left-color: var(--color-secondary);">
+                    <div class="info-card-title">
+                        <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                        <span>Mã nhân viên</span>
+                    </div>
+                    <div class="info-card-value" th:text="${employee.id}">
+                        EMP001
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Section -->
+            <div class="detail-section">
+                <h2 class="detail-section-title">Thông tin chi tiết</h2>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                        <span>ID</span>
+                    </div>
+                    <div class="detail-value">
+                        <strong th:text="${employee.id}">EMP001</strong>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                        <span>Họ và tên</span>
+                    </div>
+                    <div class="detail-value" th:text="${employee.fullName}">
+                        Nguyễn Văn A
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/mail.svg}" alt="" class="icon">
+                        <span>Email</span>
+                    </div>
+                    <div class="detail-value">
+                        <a th:href="'mailto:' + ${employee.email}" th:text="${employee.email}" style="color: var(--color-primary);">
+                            email@example.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/phone.svg}" alt="" class="icon">
+                        <span>Số điện thoại</span>
+                    </div>
+                    <div class="detail-value">
+                        <a th:href="'tel:' + ${employee.phone}" th:text="${employee.phone}" style="color: var(--color-primary);">
+                            0123456789
+                        </a>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/briefcase.svg}" alt="" class="icon">
+                        <span>Chức vụ</span>
+                    </div>
+                    <div class="detail-value" th:text="${employee.position}">
+                        Developer
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/dollar-sign.svg}" alt="" class="icon">
+                        <span>Lương</span>
+                    </div>
+                    <div class="detail-value">
+                        <strong th:text="${#numbers.formatDecimal(employee.salary, 0, 'COMMA', 0, 'POINT')}" style="color: var(--color-success);">
+                            10,000,000
+                        </strong> VNĐ
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/employees/list}" class="btn btn-outline">
+                    <span>← Quay lại danh sách</span>
+                </a>
+                <a th:href="@{/employees/edit/{id}(id=${employee.id})}" class="btn btn-primary">
+                    <img th:src="@{/icons/edit.svg}" alt="" class="icon">
+                    <span>Chỉnh sửa</span>
+                </a>
+                <a th:href="@{/contracts/list/{id}(id=${employee.id})}" class="btn btn-secondary">
+                    <img th:src="@{/icons/file-text.svg}" alt="" class="icon">
+                    <span>Xem hợp đồng</span>
+                </a>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/messages :: messages}"></div>
     </div>
-
-    <a th:href="@{/employees}">Quay lại</a>
-</div>
-
-<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

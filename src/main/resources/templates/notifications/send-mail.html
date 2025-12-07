@@ -1,46 +1,289 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head><meta charset="UTF-8"><title>Send Safe</title></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi thông báo - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-2xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .mail-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .mail-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mail-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-accent-light) 100%);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mail-icon img {
+            width: 100%;
+            height: 100%;
+            color: var(--color-primary);
+        }
+
+        .mail-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .mail-desc {
+            text-align: center;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .form-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .form-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .recipient-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .recipient-option {
+            position: relative;
+        }
+
+        .recipient-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .recipient-option label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--color-border-light);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .recipient-option input[type="radio"]:checked + label {
+            background: var(--color-primary-lighter);
+            border-color: var(--color-primary);
+            color: var(--color-primary-darker);
+        }
+
+        .recipient-option label .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .recipient-options {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Gửi mail (Secure)</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<form method="post" th:action="@{/notifications/send-mail}">
-    <label>Lựa chọn gửi:</label><br>
-    <select name="sendOption" id="sendOption" onchange="toggleEmailField()">
-        <option value="single">Gửi cho 1 nhân viên</option>
-        <option value="some">Gửi cho một số nhân viên</option>
-        <option value="all">Gửi cho tất cả nhân viên</option>
-    </select><br><br>
+    <div class="container page-container">
+        <h1 class="page-title">
+            <img th:src="@{/icons/mail.svg}" alt="" class="icon">
+            <span>Gửi thông báo Email</span>
+        </h1>
 
-    <div id="emailField">
-        <label>Email nhận (nếu gửi 1 hoặc nhiều nhân viên, ngăn cách bằng dấu ,):</label><br>
-        <input type="text" name="to"><br><br>
+        <div class="mail-container">
+            <div class="mail-card">
+                <div class="mail-icon">
+                    <img th:src="@{/icons/mail.svg}" alt="">
+                </div>
+                <h2 class="mail-title">Soạn thông báo</h2>
+                <p class="mail-desc">Gửi email thông báo đến nhân viên trong hệ thống</p>
+
+                <form method="post" th:action="@{/notifications/send-mail}">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Người nhận</h3>
+
+                        <div class="recipient-options">
+                            <div class="recipient-option">
+                                <input type="radio" name="sendOption" id="single" value="single" checked onchange="toggleEmailField()">
+                                <label for="single">
+                                    <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                                    <span>Một nhân viên</span>
+                                </label>
+                            </div>
+                            <div class="recipient-option">
+                                <input type="radio" name="sendOption" id="some" value="some" onchange="toggleEmailField()">
+                                <label for="some">
+                                    <img th:src="@{/icons/users.svg}" alt="" class="icon">
+                                    <span>Nhiều nhân viên</span>
+                                </label>
+                            </div>
+                            <div class="recipient-option">
+                                <input type="radio" name="sendOption" id="all" value="all" onchange="toggleEmailField()">
+                                <label for="all">
+                                    <img th:src="@{/icons/users.svg}" alt="" class="icon">
+                                    <span>Tất cả nhân viên</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="emailField">
+                            <label for="to" class="form-label">Email người nhận</label>
+                            <div style="position: relative;">
+                                <img th:src="@{/icons/mail.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                                <input 
+                                    type="text" 
+                                    id="to"
+                                    name="to" 
+                                    class="form-control" 
+                                    style="padding-left: 3rem;"
+                                    placeholder="email@example.com hoặc email1@example.com, email2@example.com"
+                                />
+                            </div>
+                            <span class="form-help">Nhập một hoặc nhiều email, ngăn cách bằng dấu phẩy</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Nội dung email</h3>
+
+                        <div class="form-group">
+                            <label for="subject" class="form-label required">Tiêu đề</label>
+                            <div style="position: relative;">
+                                <img th:src="@{/icons/file-text.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                                <input 
+                                    type="text" 
+                                    id="subject"
+                                    name="subject" 
+                                    class="form-control" 
+                                    style="padding-left: 3rem;"
+                                    placeholder="Nhập tiêu đề email"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label required">Nội dung</label>
+                            <textarea 
+                                id="message"
+                                name="message" 
+                                class="form-control" 
+                                rows="8"
+                                placeholder="Nhập nội dung thông báo..."
+                                required
+                            ></textarea>
+                            <span class="form-help">Nội dung chi tiết của email thông báo</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a th:href="@{/home}" class="btn btn-outline">
+                            <span>Hủy bỏ</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <img th:src="@{/icons/mail.svg}" alt="" class="icon">
+                            <span>Gửi email</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div th:if="${status}" class="alert alert-success" style="margin-top: var(--spacing-lg);">
+                    <img th:src="@{/icons/check.svg}" alt="" class="icon">
+                    <div>
+                        <strong>Thành công!</strong>
+                        <p th:text="${status}" style="margin: 0; margin-top: 0.25rem; font-size: 0.875rem;">Email đã được gửi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/messages :: messages}"></div>
     </div>
 
-    <label>Subject:</label><br>
-    <input type="text" name="subject" required><br><br>
+    <script>
+        function toggleEmailField() {
+            const option = document.querySelector('input[name="sendOption"]:checked').value;
+            const emailField = document.getElementById('emailField');
+            const emailInput = document.getElementById('to');
+            
+            if (option === 'all') {
+                emailField.style.display = 'none';
+                emailInput.required = false;
+            } else {
+                emailField.style.display = 'block';
+                emailInput.required = true;
+            }
+        }
 
-    <label>Message:</label><br>
-    <textarea name="message" required></textarea><br><br>
-
-    <button type="submit">Gửi mail</button>
-</form>
-
-<p th:text="${status}"></p>
-
-<script>
-    function toggleEmailField() {
-        const option = document.getElementById('sendOption').value;
-        const emailField = document.getElementById('emailField');
-        emailField.style.display = (option === 'all') ? 'none' : 'block';
-    }
-
-    toggleEmailField(); // Ẩn/hiện ngay khi load trang
-</script>
-
-<div th:replace="~{fragments/messages :: messages}"></div>
-
+        // Initialize on page load
+        toggleEmailField();
+    </script>
 </body>
 </html>

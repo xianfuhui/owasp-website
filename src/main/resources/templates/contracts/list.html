@@ -1,51 +1,302 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách hợp đồng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách hợp đồng - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-title-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-2xl);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .upload-section {
+            background: var(--color-border-light);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .upload-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .upload-form {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 0.625rem 1.25rem;
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-lighter);
+        }
+
+        .file-name {
+            padding: 0.625rem 1rem;
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .contract-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .contract-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .contract-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-accent-light) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contract-icon img {
+            width: 24px;
+            height: 24px;
+            color: var(--color-primary);
+        }
+
+        .contract-info {
+            flex: 1;
+        }
+
+        .contract-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .contract-meta {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .contract-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--color-text-tertiary);
+        }
+
+        .empty-state img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .contract-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .contract-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .upload-form {
+                flex-direction: column;
+            }
+
+            .upload-form .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
 <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <h2>Danh sách hợp đồng</h2>
+    <div class="container page-container">
+        <div class="page-title-section">
+            <h1 class="page-title">
+                <img th:src="@{/icons/file-text.svg}" alt="" class="icon">
+                <span>Danh sách hợp đồng</span>
+            </h1>
+        </div>
 
-    <!-- Form upload file (chỉ hiện với ADMIN) -->
-    <form sec:authorize="hasRole('ADMIN')" 
-          th:action="@{'/contracts/upload/' + ${employeeId}}" 
-          method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Upload</button>
-    </form>
+        <!-- Upload Section (Admin only) -->
+        <div class="upload-section" sec:authorize="hasRole('ADMIN')">
+            <h3>
+                <img th:src="@{/icons/upload.svg}" alt="" class="icon">
+                <span>Tải lên hợp đồng mới</span>
+            </h3>
+            <form th:action="@{'/contracts/upload/' + ${employeeId}}" 
+                  method="post" 
+                  enctype="multipart/form-data"
+                  class="upload-form"
+                  onsubmit="return validateFile()">
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" id="fileInput" required onchange="updateFileName()">
+                    <label for="fileInput" class="file-input-label">
+                        <img th:src="@{/icons/file-text.svg}" alt="" class="icon">
+                        <span>Chọn file</span>
+                    </label>
+                </div>
+                <span class="file-name" id="fileName">Chưa chọn file</span>
+                <button type="submit" class="btn btn-primary">
+                    <img th:src="@{/icons/upload.svg}" alt="" class="icon">
+                    <span>Tải lên</span>
+                </button>
+            </form>
+        </div>
 
-    <!-- Bảng danh sách hợp đồng -->
-    <table>
-        <thead>
-            <tr>
-                <th>Tên file</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="c : ${contracts}">
-                <td th:text="${c.fileName}"></td>
-                <td>
-                    <a th:href="@{'/contracts/view/' + ${c.id}}" target="_blank">Xem</a>
-                    <a th:href="@{'/contracts/download/' + ${c.id}}">Tải</a>
-                    <a sec:authorize="hasRole('ADMIN')" 
-                       th:href="@{'/contracts/delete/' + ${c.id}}"
-                       onclick="return confirm('Bạn có chắc muốn xóa file này?');">Xóa</a>
-                </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(contracts)}">
-                <td colspan="2">Chưa có hợp đồng nào.</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Contracts List -->
+        <div class="card">
+            <div th:if="${#lists.isEmpty(contracts)}">
+                <div class="empty-state">
+                    <img th:src="@{/icons/file-text.svg}" alt="">
+                    <h3>Chưa có hợp đồng nào</h3>
+                    <p>Bắt đầu bằng cách tải lên hợp đồng đầu tiên</p>
+                </div>
+            </div>
 
-    <div th:replace="~{fragments/messages :: messages}"></div>
+            <div th:if="${!#lists.isEmpty(contracts)}">
+                <div th:each="c : ${contracts}" class="contract-card">
+                    <div class="contract-icon">
+                        <img th:src="@{/icons/file-text.svg}" alt="">
+                    </div>
+                    <div class="contract-info">
+                        <div class="contract-name" th:text="${c.fileName}">contract.pdf</div>
+                        <div class="contract-meta">Hợp đồng lao động</div>
+                    </div>
+                    <div class="contract-actions">
+                        <a th:href="@{'/contracts/view/' + ${c.id}}" target="_blank" class="btn btn-sm btn-outline" title="Xem">
+                            <img th:src="@{/icons/eye.svg}" alt="" class="icon">
+                            <span>Xem</span>
+                        </a>
+                        <a th:href="@{'/contracts/download/' + ${c.id}}" class="btn btn-sm btn-primary" title="Tải xuống">
+                            <img th:src="@{/icons/download.svg}" alt="" class="icon">
+                            <span>Tải</span>
+                        </a>
+                        <button 
+                            sec:authorize="hasRole('ADMIN')"
+                            onclick="confirmDelete(this)"
+                            th:data-url="@{'/contracts/delete/' + ${c.id}}"
+                            class="btn btn-sm btn-danger"
+                            title="Xóa">
+                            <img th:src="@{/icons/trash.svg}" alt="" class="icon">
+                            <span>Xóa</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
+
+    <script>
+        function updateFileName() {
+            const input = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+            if (input.files.length > 0) {
+                fileName.textContent = input.files[0].name;
+            } else {
+                fileName.textContent = 'Chưa chọn file';
+            }
+        }
+
+        function validateFile() {
+            const input = document.getElementById('fileInput');
+            if (input.files.length === 0) {
+                alert('Vui lòng chọn file để tải lên');
+                return false;
+            }
+            return true;
+        }
+
+        function confirmDelete(button) {
+            if (confirm('Bạn có chắc chắn muốn xóa hợp đồng này?')) {
+                window.location.href = button.getAttribute('data-url');
+            }
+        }
+    </script>
 </body>
-
 </html>

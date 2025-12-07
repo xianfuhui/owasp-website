@@ -1,48 +1,180 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Tài khoản của nhân viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản nhân viên - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .employee-info {
+            background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-accent-light) 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .employee-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .employee-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-primary-darker);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--color-text-tertiary);
+        }
+
+        .empty-state img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Tài khoản của nhân viên: <span th:text="${employee.fullName}"></span></h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<a href="/employees/list">← Quay lại danh sách nhân viên</a>
-<br/><br/>
+    <div class="container page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <img th:src="@{/icons/settings.svg}" alt="" class="icon">
+                <span>Tài khoản của nhân viên</span>
+            </h1>
+        </div>
 
-<!-- Thông báo error / success -->
-<div th:if="${errorMessage}" style="color:red;">
-    <p th:text="${errorMessage}"></p>
-</div>
-<div th:if="${successMessage}" style="color:green;">
-    <p th:text="${successMessage}"></p>
-</div>
+        <div class="employee-info">
+            <div class="employee-avatar">
+                <span th:text="${#strings.substring(employee.fullName, 0, 1)}">A</span>
+            </div>
+            <div class="employee-name" th:text="${employee.fullName}">Nguyễn Văn A</div>
+        </div>
 
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Trạng thái</th>
-            <th th:if="${currentAccount.role == 'ADMIN'}">Hành động</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:each="acc : ${accounts}">
-            <td th:text="${acc.username}"></td>
-            <td th:text="${acc.role}"></td>
-            <td th:text="${acc.locked ? 'Khóa' : 'Hoạt động'}"></td>
-            <td th:if="${currentAccount.role == 'ADMIN'}">
-                <a th:href="@{/accounts/edit/{id}(id=${acc.id})}">Sửa</a> |
-                <a th:href="@{/accounts/delete/{id}(id=${acc.id})}" 
-                   onclick="return confirm('Xóa tài khoản?')">Xóa</a>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(accounts)}">
-            <td colspan="4">Chưa có tài khoản</td>
-        </tr>
-    </tbody>
-</table>
+        <div class="card">
+            <div th:if="${#lists.isEmpty(accounts)}">
+                <div class="empty-state">
+                    <img th:src="@{/icons/settings.svg}" alt="">
+                    <h3>Chưa có tài khoản nào</h3>
+                    <p>Nhân viên này chưa được tạo tài khoản đăng nhập</p>
+                </div>
+            </div>
 
+            <div th:if="${!#lists.isEmpty(accounts)}">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tên đăng nhập</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th th:if="${currentAccount.role == 'ADMIN'}" style="text-align: center;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="acc : ${accounts}">
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                                            <span th:text="${#strings.substring(acc.username, 0, 1).toUpperCase()}">A</span>
+                                        </div>
+                                        <strong th:text="${acc.username}">admin</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span 
+                                        class="role-badge"
+                                        th:classappend="${acc.role == 'ADMIN'} ? 'admin' : (${acc.role == 'HR'} ? 'hr' : 'user')"
+                                        th:text="${acc.role}">
+                                        ADMIN
+                                    </span>
+                                </td>
+                                <td>
+                                    <span 
+                                        class="status-badge"
+                                        th:classappend="${acc.locked} ? 'locked' : 'active'"
+                                        th:text="${acc.locked} ? 'Đã khóa' : 'Hoạt động'">
+                                        Hoạt động
+                                    </span>
+                                </td>
+                                <td th:if="${currentAccount.role == 'ADMIN'}">
+                                    <div class="table-actions" style="justify-content: center;">
+                                        <a th:href="@{/accounts/edit/{id}(id=${acc.id})}" class="action-icon-btn edit" title="Chỉnh sửa">
+                                            <img th:src="@{/icons/edit.svg}" alt="" class="icon">
+                                        </a>
+                                        <button 
+                                            onclick="confirmDelete(this)"
+                                            th:data-url="@{/accounts/delete/{id}(id=${acc.id})}"
+                                            class="action-icon-btn delete"
+                                            title="Xóa">
+                                            <img th:src="@{/icons/trash.svg}" alt="" class="icon">
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: var(--spacing-xl);">
+            <a th:href="@{/employees/list}" class="btn btn-outline">
+                <span>← Quay lại danh sách nhân viên</span>
+            </a>
+        </div>
+
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
+
+    <script>
+        function confirmDelete(button) {
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
+                window.location.href = button.getAttribute('data-url');
+            }
+        }
+    </script>
 </body>
 </html>

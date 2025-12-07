@@ -1,10 +1,45 @@
-<!— fragments/messages.html —>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+</head>
+<body>
 <div th:fragment="messages">
-    <div th:if="${errorMessage}" style="color:red;">
-        <p th:text="${errorMessage}"></p>
+    <!-- Success Message -->
+    <div th:if="${successMessage}" class="alert alert-success" style="animation: slideIn 0.3s ease-out;">
+        <img th:src="@{/icons/check.svg}" alt="" class="icon">
+        <div>
+            <strong>Thành công!</strong>
+            <p th:text="${successMessage}" style="margin: 0; margin-top: 0.25rem; font-size: 0.875rem;">Thao tác đã được thực hiện thành công.</p>
+        </div>
     </div>
 
-    <div th:if="${successMessage}" style="color:green;">
-        <p th:text="${successMessage}"></p>
+    <!-- Error Message -->
+    <div th:if="${errorMessage}" class="alert alert-error" style="animation: slideIn 0.3s ease-out;">
+        <img th:src="@{/icons/alert-circle.svg}" alt="" class="icon">
+        <div>
+            <strong>Lỗi!</strong>
+            <p th:text="${errorMessage}" style="margin: 0; margin-top: 0.25rem; font-size: 0.875rem;">Đã xảy ra lỗi khi thực hiện thao tác.</p>
+        </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div th:if="${warningMessage}" class="alert alert-warning" style="animation: slideIn 0.3s ease-out;">
+        <img th:src="@{/icons/alert-circle.svg}" alt="" class="icon">
+        <div>
+            <strong>Cảnh báo!</strong>
+            <p th:text="${warningMessage}" style="margin: 0; margin-top: 0.25rem; font-size: 0.875rem;">Vui lòng kiểm tra lại thông tin.</p>
+        </div>
+    </div>
+
+    <!-- Info Message -->
+    <div th:if="${infoMessage}" class="alert alert-info" style="animation: slideIn 0.3s ease-out;">
+        <img th:src="@{/icons/bell.svg}" alt="" class="icon">
+        <div>
+            <strong>Thông báo</strong>
+            <p th:text="${infoMessage}" style="margin: 0; margin-top: 0.25rem; font-size: 0.875rem;">Thông tin quan trọng.</p>
+        </div>
     </div>
 </div>
+</body>
+</html>

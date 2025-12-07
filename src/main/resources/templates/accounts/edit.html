@@ -1,53 +1,197 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Sửa tài khoản</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa tài khoản - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-warning);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+        }
+
+        .form-card {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Sửa tài khoản</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<form th:action="@{|/accounts/edit/${account.id}|}" th:object="${account}" method="post">
+    <div class="container page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <img th:src="@{/icons/edit.svg}" alt="" class="icon">
+                <span>Chỉnh sửa tài khoản</span>
+            </h1>
+            <div class="breadcrumb">
+                <a th:href="@{/home}">Trang chủ</a>
+                <span>/</span>
+                <a th:href="@{/accounts/list}">Tài khoản</a>
+                <span>/</span>
+                <span>Chỉnh sửa</span>
+            </div>
+        </div>
 
-    Username: <input type="text" th:field="*{username}" /><br/><br/>
+        <div class="card form-card">
+            <form th:action="@{|/accounts/edit/${account.id}|}" th:object="${account}" method="post">
+                <div class="form-section">
+                    <h2 class="form-section-title">Thông tin đăng nhập</h2>
 
-    Password (để trống nếu không đổi):
-    <input type="password" th:field="*{password}" /><br/><br/>
+                    <div class="form-group">
+                        <label for="username" class="form-label required">Tên đăng nhập</label>
+                        <div style="position: relative;">
+                            <img th:src="@{/icons/user.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                            <input 
+                                type="text" 
+                                id="username"
+                                th:field="*{username}" 
+                                class="form-control" 
+                                style="padding-left: 3rem;"
+                                placeholder="Nhập tên đăng nhập"
+                                required
+                            />
+                        </div>
+                    </div>
 
-    Nhân viên:
-    <select name="employeeId">
-        <option th:each="emp : ${employees}"
-                th:value="${emp.id}"
-                th:text="${emp.fullName}"
-                th:selected="${emp.id == account.employeeId}">
-        </option>
-    </select>
-    <br/><br/>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Mật khẩu mới</label>
+                        <div style="position: relative;">
+                            <img th:src="@{/icons/lock.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary);">
+                            <input 
+                                type="password" 
+                                id="password"
+                                th:field="*{password}" 
+                                class="form-control" 
+                                style="padding-left: 3rem;"
+                                placeholder="Để trống nếu không đổi mật khẩu"
+                            />
+                        </div>
+                        <span class="form-help">Chỉ nhập nếu muốn thay đổi mật khẩu</span>
+                    </div>
+                </div>
 
-    Role:
-    <select name="role">
-        <option th:each="r : ${roles}"
-                th:value="${r}"
-                th:text="${r}"
-                th:selected="${r == account.role}">
-        </option>
-    </select>
-    <br/><br/>
+                <div class="form-section">
+                    <h2 class="form-section-title">Liên kết nhân viên</h2>
 
-    <button type="submit">Cập nhật</button>
-</form>
+                    <div class="form-group">
+                        <label for="employeeId" class="form-label required">Nhân viên</label>
+                        <div style="position: relative;">
+                            <img th:src="@{/icons/user.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary); z-index: 1;">
+                            <select name="employeeId" id="employeeId" class="form-control" style="padding-left: 3rem;" required>
+                                <option value="">Chọn nhân viên...</option>
+                                <option th:each="emp : ${employees}"
+                                        th:value="${emp.id}"
+                                        th:text="${emp.fullName}"
+                                        th:selected="${emp.id == account.employeeId}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-<div th:if="${errorMessage}" style="color:red;">
-    <p th:text="${errorMessage}"></p>
-</div>
+                <div class="form-section">
+                    <h2 class="form-section-title">Phân quyền</h2>
 
-<div th:if="${successMessage}" style="color:green;">
-    <p th:text="${successMessage}"></p>
-</div>
+                    <div class="form-group">
+                        <label for="role" class="form-label required">Vai trò</label>
+                        <div style="position: relative;">
+                            <img th:src="@{/icons/settings.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary); z-index: 1;">
+                            <select name="role" id="role" class="form-control" style="padding-left: 3rem;" required>
+                                <option value="">Chọn vai trò...</option>
+                                <option th:each="r : ${roles}"
+                                        th:value="${r}"
+                                        th:text="${r}"
+                                        th:selected="${r == account.role}">
+                                </option>
+                            </select>
+                        </div>
+                        <span class="form-help">
+                            <strong>ADMIN:</strong> Toàn quyền | 
+                            <strong>HR:</strong> Quản lý nhân viên | 
+                            <strong>USER:</strong> Xem thông tin cá nhân
+                        </span>
+                    </div>
+                </div>
 
-<br/>
-<a href="/accounts/list">Quay lại</a>
+                <div class="form-actions">
+                    <a th:href="@{/accounts/list}" class="btn btn-outline">
+                        <span>Hủy bỏ</span>
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <img th:src="@{/icons/check.svg}" alt="" class="icon">
+                        <span>Cập nhật</span>
+                    </button>
+                </div>
+            </form>
+        </div>
 
-<div th:replace="~{fragments/messages :: messages}"></div>
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
 </body>
 </html>

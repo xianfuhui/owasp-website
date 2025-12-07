@@ -1,33 +1,326 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Chi tiết tài khoản</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết tài khoản - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+        }
+
+        .detail-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .account-header {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .account-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            box-shadow: var(--shadow-xl);
+            flex-shrink: 0;
+        }
+
+        .account-info h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .role-badge-large {
+            display: inline-flex;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-section {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .detail-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .detail-row {
+            display: flex;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            flex: 0 0 180px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .detail-label .icon {
+            width: 1.125rem;
+            height: 1.125rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--color-text-primary);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border-radius: var(--radius-full);
+        }
+
+        .status-badge.active {
+            background: var(--color-success-light);
+            color: #065F46;
+        }
+
+        .status-badge.locked {
+            background: var(--color-error-light);
+            color: #991B1B;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .account-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+
+            .detail-label {
+                flex: none;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Chi tiết tài khoản</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<p><b>Username:</b> <span th:text="${account.username}"></span></p>
-<p><b>Role:</b> <span th:text="${account.role}"></span></p>
+    <div class="container page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                <span>Chi tiết tài khoản</span>
+            </h1>
+            <div class="breadcrumb">
+                <a th:href="@{/home}">Trang chủ</a>
+                <span>/</span>
+                <a th:href="@{/accounts/list}">Tài khoản</a>
+                <span>/</span>
+                <span>Chi tiết</span>
+            </div>
+        </div>
 
-<p><b>Thuộc nhân viên:</b>
-    <span th:if="${employee != null}" th:text="${employee.fullName}"></span>
-    <span th:if="${employee == null}">Không có</span>
-</p>
+        <div class="detail-container">
+            <!-- Account Header -->
+            <div class="account-header">
+                <div class="account-avatar">
+                    <span th:text="${#strings.substring(account.username, 0, 1).toUpperCase()}">A</span>
+                </div>
+                <div class="account-info">
+                    <h1 th:text="${account.username}">admin</h1>
+                    <span class="role-badge-large" th:text="${account.role}">ADMIN</span>
+                </div>
+            </div>
 
-<p><b>Trạng thái:</b>
-    <span th:if="${account.locked}">Locked</span>
-    <span th:unless="${account.locked}">Active</span>
-</p>
+            <!-- Detail Section -->
+            <div class="detail-section">
+                <h2 class="detail-section-title">Thông tin tài khoản</h2>
 
-<br/>
-<a th:href="@{|/accounts/edit/${account.id}|}">Sửa</a> |
-<a th:href="@{|/accounts/delete/${account.id}|}"
-   onclick="return confirm('Xóa tài khoản này?')">Xóa</a>
-<br/><br/>
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                        <span>Tên đăng nhập</span>
+                    </div>
+                    <div class="detail-value">
+                        <strong th:text="${account.username}">admin</strong>
+                    </div>
+                </div>
 
-<a href="/accounts/list">Quay lại</a>
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/settings.svg}" alt="" class="icon">
+                        <span>Vai trò</span>
+                    </div>
+                    <div class="detail-value">
+                        <span 
+                            class="role-badge"
+                            th:classappend="${account.role == 'ADMIN'} ? 'admin' : (${account.role == 'HR'} ? 'hr' : 'user')"
+                            th:text="${account.role}">
+                            ADMIN
+                        </span>
+                    </div>
+                </div>
 
-<div th:replace="~{fragments/messages :: messages}"></div>
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                        <span>Nhân viên</span>
+                    </div>
+                    <div class="detail-value">
+                        <span th:if="${employee != null}">
+                            <a th:href="@{'/employees/detail/' + ${employee.id}}" th:text="${employee.fullName}" style="color: var(--color-primary); font-weight: 600;">
+                                Nguyễn Văn A
+                            </a>
+                        </span>
+                        <span th:if="${employee == null}" style="color: var(--color-text-tertiary);">
+                            Chưa liên kết
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">
+                        <img th:src="@{/icons/alert-circle.svg}" alt="" class="icon">
+                        <span>Trạng thái</span>
+                    </div>
+                    <div class="detail-value">
+                        <span 
+                            class="status-badge"
+                            th:classappend="${account.locked} ? 'locked' : 'active'"
+                            th:text="${account.locked} ? 'Đã khóa' : 'Hoạt động'">
+                            Hoạt động
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/accounts/list}" class="btn btn-outline">
+                    <span>← Quay lại danh sách</span>
+                </a>
+                <a th:href="@{|/accounts/edit/${account.id}|}" class="btn btn-primary">
+                    <img th:src="@{/icons/edit.svg}" alt="" class="icon">
+                    <span>Chỉnh sửa</span>
+                </a>
+                <button 
+                    onclick="confirmDelete()"
+                    th:data-url="@{|/accounts/delete/${account.id}|}"
+                    class="btn btn-danger">
+                    <img th:src="@{/icons/trash.svg}" alt="" class="icon">
+                    <span>Xóa tài khoản</span>
+                </button>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
+
+    <script th:inline="javascript">
+        function confirmDelete() {
+            const url = /*[[${'/accounts/delete/' + account.id}]]*/ '';
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
+                window.location.href = url;
+            }
+        }
+    </script>
 </body>
 </html>

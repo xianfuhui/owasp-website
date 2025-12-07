@@ -1,66 +1,175 @@
-<!-- templates/fragments/navbar.html -->
-<div xmlns:th="http://www.thymeleaf.org"
-     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-     th:fragment="navbar">
-    <nav style="background-color:#333; overflow:hidden; padding:0 10px;">
-        <div class="dropdown" sec:authorize="hasAnyRole('USER','HR','ADMIN')" style="float:left; overflow:hidden;">
-            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
-                Profile ▼
-            </button>
-            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
-                <a th:href="@{/employees/}" style="color:white; padding:12px 16px; display:block;">Xem chi tiết</a>
-                <a th:href="@{/accounts/change-password}" style="color:white; padding:12px 16px; display:block;">Đổi mật khẩu</a>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+</head>
+<body>
+<nav th:fragment="navbar" class="navbar">
+    <div class="navbar-container">
+        <a th:href="@{/home}" class="navbar-brand">
+            <img th:src="@{/icons/users.svg}" alt="HR" class="icon">
+            <span>HR Management</span>
+        </a>
 
-        <!-- Employees Dropdown (HR & ADMIN) -->
-        <div class="dropdown" sec:authorize="hasAnyRole('HR','ADMIN')" style="float:left; overflow:hidden;">
-            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
-                Employees ▼
-            </button>
-            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
-                <a th:href="@{/employees/list}" style="color:white; padding:12px 16px; display:block;">Danh sách</a>
-                <a th:href="@{/employees/add}" style="color:white; padding:12px 16px; display:block;">Thêm mới</a>
-                <a th:href="@{/employees/import}" style="color:white; padding:12px 16px; display:block;">Thêm từ excel</a>
-                <a th:href="@{/employees/avatars/upload-avatar}" style="color:white; padding:12px 16px; display:block;">Upload Avatar</a>
-                <a th:href="@{/employees/search}" style="color:white; padding:12px 16px; display:block;">Search</a>
-            </div>
-        </div>
+        <button class="navbar-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-        <!-- Accounts Dropdown (ADMIN) -->
-        <div class="dropdown" sec:authorize="hasRole('ADMIN')" style="float:left; overflow:hidden;">
-            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
-                Accounts ▼
-            </button>
-            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
-                <a th:href="@{/accounts/list}" style="color:white; padding:12px 16px; display:block;">Danh sách</a>
-                <a th:href="@{/accounts/add}" style="color:white; padding:12px 16px; display:block;">Thêm mới</a>
-            </div>
-        </div>
+        <ul class="navbar-menu" id="navbarMenu">
+            <!-- Home -->
+            <li class="navbar-item">
+                <a th:href="@{/home}" class="navbar-link">
+                    <img th:src="@{/icons/home.svg}" alt="" class="icon">
+                    <span>Trang chủ</span>
+                </a>
+            </li>
 
-        <!-- Home -->
-        <a th:href="@{/home}" style="color:white; padding:12px 16px; text-decoration:none;">Home</a>
+            <!-- Profile Dropdown (All authenticated users) -->
+            <li class="navbar-item navbar-dropdown" sec:authorize="hasAnyRole('USER','HR','ADMIN')">
+                <button class="navbar-dropdown-toggle" onclick="toggleDropdown(this)">
+                    <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                    <span>Hồ sơ</span>
+                </button>
+                <ul class="navbar-dropdown-menu">
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/eye.svg}" alt="" class="icon">
+                            <span>Xem chi tiết</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/accounts/change-password}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/lock.svg}" alt="" class="icon">
+                            <span>Đổi mật khẩu</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-        <!-- Contracts -->
-        <a th:href="@{/contracts/}" style="color:white; padding:12px 16px; text-decoration:none;">Contracts</a>
+            <!-- Employees Dropdown (HR & ADMIN) -->
+            <li class="navbar-item navbar-dropdown" sec:authorize="hasAnyRole('HR','ADMIN')">
+                <button class="navbar-dropdown-toggle" onclick="toggleDropdown(this)">
+                    <img th:src="@{/icons/users.svg}" alt="" class="icon">
+                    <span>Nhân viên</span>
+                </button>
+                <ul class="navbar-dropdown-menu">
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/list}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/users.svg}" alt="" class="icon">
+                            <span>Danh sách</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/add}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/plus.svg}" alt="" class="icon">
+                            <span>Thêm mới</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/import}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/upload.svg}" alt="" class="icon">
+                            <span>Thêm từ Excel</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/avatars/upload-avatar}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/user.svg}" alt="" class="icon">
+                            <span>Upload Avatar</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/employees/search}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/search.svg}" alt="" class="icon">
+                            <span>Tìm kiếm</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-        <!-- Notifications -->
-        <a th:href="@{/notifications/send-mail}" sec:authorize="hasAnyRole('HR','ADMIN')" style="color:white; padding:12px 16px; text-decoration:none;">Notifications</a>
+            <!-- Accounts Dropdown (ADMIN only) -->
+            <li class="navbar-item navbar-dropdown" sec:authorize="hasRole('ADMIN')">
+                <button class="navbar-dropdown-toggle" onclick="toggleDropdown(this)">
+                    <img th:src="@{/icons/settings.svg}" alt="" class="icon">
+                    <span>Tài khoản</span>
+                </button>
+                <ul class="navbar-dropdown-menu">
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/accounts/list}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/users.svg}" alt="" class="icon">
+                            <span>Danh sách</span>
+                        </a>
+                    </li>
+                    <li class="navbar-dropdown-item">
+                        <a th:href="@{/accounts/add}" class="navbar-dropdown-link">
+                            <img th:src="@{/icons/plus.svg}" alt="" class="icon">
+                            <span>Thêm mới</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-        <!-- Logout -->
-        <a th:href="@{/logout}" style="color:white; padding:12px 16px; text-decoration:none;">Logout</a>
-    </nav>
+            <!-- Contracts -->
+            <li class="navbar-item">
+                <a th:href="@{/contracts/}" class="navbar-link">
+                    <img th:src="@{/icons/file-text.svg}" alt="" class="icon">
+                    <span>Hợp đồng</span>
+                </a>
+            </li>
 
-    <script>
-        // dropdown hover
-        const dropdowns = document.querySelectorAll('.dropdown');
-        dropdowns.forEach(dd => {
-            dd.addEventListener('mouseover', () => {
-                dd.querySelector('.dropdown-content').style.display = 'block';
+            <!-- Notifications (HR & ADMIN) -->
+            <li class="navbar-item" sec:authorize="hasAnyRole('HR','ADMIN')">
+                <a th:href="@{/notifications/send-mail}" class="navbar-link">
+                    <img th:src="@{/icons/bell.svg}" alt="" class="icon">
+                    <span>Thông báo</span>
+                </a>
+            </li>
+
+            <!-- Logout -->
+            <li class="navbar-item">
+                <a th:href="@{/logout}" class="navbar-link">
+                    <img th:src="@{/icons/log-out.svg}" alt="" class="icon">
+                    <span>Đăng xuất</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('navbarMenu');
+        menu.classList.toggle('active');
+    }
+
+    function toggleDropdown(button) {
+        const dropdown = button.parentElement;
+        const allDropdowns = document.querySelectorAll('.navbar-dropdown');
+        
+        // Close other dropdowns on mobile
+        if (window.innerWidth <= 768) {
+            allDropdowns.forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('active');
+                }
             });
-            dd.addEventListener('mouseout', () => {
-                dd.querySelector('.dropdown-content').style.display = 'none';
-            });
-        });
-    </script>
-</div>
+            dropdown.classList.toggle('active');
+        }
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const navbar = document.querySelector('.navbar');
+        const toggle = document.querySelector('.navbar-toggle');
+        const menu = document.getElementById('navbarMenu');
+        
+        if (!navbar.contains(event.target) && menu.classList.contains('active')) {
+            menu.classList.remove('active');
+        }
+    });
+</script>
+</body>
+</html>

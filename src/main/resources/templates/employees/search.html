@@ -1,38 +1,308 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Tìm kiếm nhân viên</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm kiếm nhân viên - HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <style>
+        .page-container {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-2xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .page-title .icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--color-primary);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto var(--spacing-2xl);
+        }
+
+        .search-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .search-method-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-method-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .search-method-title .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .search-method-desc {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-form {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .search-form input {
+            flex: 1;
+        }
+
+        .results-section {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .results-count {
+            color: var(--color-text-tertiary);
+            font-size: 0.9375rem;
+        }
+
+        .employee-result-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .employee-result-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .employee-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .employee-info {
+            flex: 1;
+        }
+
+        .employee-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .employee-details {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        .employee-detail-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .employee-detail-item .icon {
+            width: 1rem;
+            height: 1rem;
+            color: var(--color-text-tertiary);
+        }
+
+        .empty-results {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--color-text-tertiary);
+        }
+
+        .empty-results img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .search-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .employee-result-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .employee-details {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-<h2>Tìm kiếm nhân viên</h2>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<form action="/employees/search-vulnerable" method="get">
-    <input type="text" name="q" placeholder="Search name...">
-    <button type="submit">Search (Vulnerable)</button>
-</form>
+    <div class="container page-container">
+        <h1 class="page-title">
+            <img th:src="@{/icons/search.svg}" alt="" class="icon">
+            <span>Tìm kiếm nhân viên</span>
+        </h1>
 
-<form action="/employees/search" method="get">
-    <input type="text" name="q" placeholder="Search name...">
-    <button type="submit">Search (Safe)</button>
-</form>
+        <div class="search-container">
+            <div class="search-methods">
+                <!-- Safe Search -->
+                <div class="search-method-card">
+                    <h3 class="search-method-title">
+                        <img th:src="@{/icons/check.svg}" alt="" class="icon" style="color: var(--color-success);">
+                        <span>Tìm kiếm an toàn</span>
+                    </h3>
+                    <p class="search-method-desc">Phương pháp tìm kiếm được bảo mật, sử dụng parameterized queries</p>
+                    <form action="/employees/search" method="get" class="search-form">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            class="form-control" 
+                            placeholder="Nhập tên nhân viên..."
+                            required
+                        />
+                        <button type="submit" class="btn btn-primary">
+                            <img th:src="@{/icons/search.svg}" alt="" class="icon">
+                            <span>Tìm</span>
+                        </button>
+                    </form>
+                </div>
 
-<hr>
+                <!-- Vulnerable Search (for testing) -->
+                <div class="search-method-card" style="border: 2px solid var(--color-warning);">
+                    <h3 class="search-method-title">
+                        <img th:src="@{/icons/alert-circle.svg}" alt="" class="icon" style="color: var(--color-warning);">
+                        <span>Tìm kiếm dễ bị tấn công</span>
+                    </h3>
+                    <p class="search-method-desc">Phương pháp không an toàn (chỉ dùng để test bảo mật)</p>
+                    <form action="/employees/search-vulnerable" method="get" class="search-form">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            class="form-control" 
+                            placeholder="Nhập tên nhân viên..."
+                            required
+                        />
+                        <button type="submit" class="btn btn-outline" style="border-color: var(--color-warning); color: var(--color-warning);">
+                            <img th:src="@{/icons/search.svg}" alt="" class="icon">
+                            <span>Tìm</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-<table>
-    <tr>
-        <th>Name</th>
-    </tr>
+        <!-- Search Results -->
+        <div class="results-section" th:if="${employees != null}">
+            <div class="card">
+                <div class="results-header">
+                    <h2 class="results-title">Kết quả tìm kiếm</h2>
+                    <span class="results-count">
+                        Tìm thấy <strong th:text="${#lists.size(employees)}">0</strong> nhân viên
+                    </span>
+                </div>
 
-    <tr th:each="e : ${employees}">
-        <td th:text="${e.fullName}"></td>
-    </tr>
-</table>
+                <div th:if="${#lists.isEmpty(employees)}">
+                    <div class="empty-results">
+                        <img th:src="@{/icons/search.svg}" alt="">
+                        <h3>Không tìm thấy kết quả</h3>
+                        <p>Vui lòng thử lại với từ khóa khác</p>
+                    </div>
+                </div>
 
+                <div th:if="${!#lists.isEmpty(employees)}">
+                    <div th:each="e : ${employees}" class="employee-result-card">
+                        <div class="employee-avatar">
+                            <span th:text="${#strings.substring(e.fullName, 0, 1)}">A</span>
+                        </div>
+                        <div class="employee-info">
+                            <div class="employee-name" th:text="${e.fullName}">Nguyễn Văn A</div>
+                            <div class="employee-details">
+                                <div class="employee-detail-item">
+                                    <img th:src="@{/icons/briefcase.svg}" alt="" class="icon">
+                                    <span th:text="${e.position}">Developer</span>
+                                </div>
+                                <div class="employee-detail-item">
+                                    <img th:src="@{/icons/mail.svg}" alt="" class="icon">
+                                    <span th:text="${e.email}">email@example.com</span>
+                                </div>
+                                <div class="employee-detail-item">
+                                    <img th:src="@{/icons/phone.svg}" alt="" class="icon">
+                                    <span th:text="${e.phone}">0123456789</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a th:href="@{'/employees/detail/' + ${e.id}}" class="btn btn-sm btn-primary">
+                            <img th:src="@{/icons/eye.svg}" alt="" class="icon">
+                            <span>Xem</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<a href="/employees">Quay lại</a>
+        <div style="margin-top: var(--spacing-xl);">
+            <a th:href="@{/employees/list}" class="btn btn-outline">
+                <span>← Quay lại danh sách</span>
+            </a>
+        </div>
 
-<div th:replace="~{fragments/messages :: messages}"></div>
-
+        <div th:replace="~{fragments/messages :: messages}"></div>
+    </div>
 </body>
 </html>
