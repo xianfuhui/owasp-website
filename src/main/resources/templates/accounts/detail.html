@@ -4,7 +4,7 @@
     <title>Chi tiết tài khoản</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Chi tiết tài khoản</h2>
 
 <p><b>Username:</b> <span th:text="${account.username}"></span></p>
@@ -28,5 +28,6 @@
 
 <a href="/accounts/list">Quay lại</a>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

@@ -4,32 +4,44 @@
     <title>Tài khoản của nhân viên</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Tài khoản của nhân viên: <span th:text="${employee.fullName}"></span></h2>
 
 <a href="/employees/list">← Quay lại danh sách nhân viên</a>
 <br/><br/>
 
+<!-- Thông báo error / success -->
+<div th:if="${errorMessage}" style="color:red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+<div th:if="${successMessage}" style="color:green;">
+    <p th:text="${successMessage}"></p>
+</div>
+
 <table border="1" cellpadding="8">
-    <tr>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Trạng thái</th>
-        <th>Hành động</th>
-    </tr>
-    <tr th:if="${account != null}">
-        <td th:text="${account.username}"></td>
-        <td th:text="${account.role}"></td>
-        <td th:text="${account.locked ? 'Khóa' : 'Hoạt động'}"></td>
-        <td>
-            <a th:href="@{/accounts/edit/{id}(id=${account.id})}">Sửa</a> |
-            <a th:href="@{/accounts/delete/{id}(id=${account.id})}" 
-               onclick="return confirm('Xóa tài khoản?')">Xóa</a>
-        </td>
-    </tr>
-    <tr th:if="${account == null}">
-        <td colspan="4">Chưa có tài khoản</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Trạng thái</th>
+            <th th:if="${currentAccount.role == 'ADMIN'}">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="acc : ${accounts}">
+            <td th:text="${acc.username}"></td>
+            <td th:text="${acc.role}"></td>
+            <td th:text="${acc.locked ? 'Khóa' : 'Hoạt động'}"></td>
+            <td th:if="${currentAccount.role == 'ADMIN'}">
+                <a th:href="@{/accounts/edit/{id}(id=${acc.id})}">Sửa</a> |
+                <a th:href="@{/accounts/delete/{id}(id=${acc.id})}" 
+                   onclick="return confirm('Xóa tài khoản?')">Xóa</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(accounts)}">
+            <td colspan="4">Chưa có tài khoản</td>
+        </tr>
+    </tbody>
 </table>
 
 </body>

@@ -1,0 +1,10 @@
+<!— fragments/messages.html —>
+<div th:fragment="messages">
+    <div th:if="${errorMessage}" style="color:red;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <div th:if="${successMessage}" style="color:green;">
+        <p th:text="${successMessage}"></p>
+    </div>
+</div>

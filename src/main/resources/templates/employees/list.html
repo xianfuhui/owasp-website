@@ -4,7 +4,7 @@
     <title>Employee List</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Danh sách nhân viên</h2>
 
 <a href="/employees/add">+ Thêm nhân viên</a>
@@ -34,12 +34,13 @@
             |
             <a th:href="@{'/employees/detail/' + ${e.id}}">Xem</a>
             |
-            <a th:href="@{/contracts/employee/{id}(id=${e.id})}">Xem hợp đồng</a>
+            <a th:href="@{/contracts/list/{id}(id=${e.id})}">Xem hợp đồng</a>
             |
             <a th:href="@{/employees/accounts/{id}(id=${e.id})}">Xem tài khoản</a>
         </td>
     </tr>
 </table>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

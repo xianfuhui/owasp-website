@@ -4,9 +4,11 @@
     <title>Chi tiết nhân viên</title>
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Thông tin nhân viên</h2>
 
 <div>
+    <p><strong>ID:</strong> <span th:text="${employee.id}"></span></p>
     <p><strong>Họ tên:</strong> <span th:text="${employee.fullName}"></span></p>
     <p><strong>Email:</strong> <span th:text="${employee.email}"></span></p>
     <p><strong>Số điện thoại:</strong> <span th:text="${employee.phone}"></span></p>
@@ -22,5 +24,6 @@
     <a th:href="@{/employees}">Quay lại</a>
 </div>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

@@ -1,9 +1,17 @@
 package com.example.hr.service;
 
 import com.example.hr.entity.Contract;
+import com.example.hr.entity.Account;
 import com.example.hr.repository.ContractRepository;
-import org.springframework.stereotype.Service;
+import com.example.hr.util.AccessControlUtil;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.List;
 
 @Service
@@ -15,15 +23,62 @@ public class ContractService {
         this.repo = repo;
     }
 
-    public List<Contract> getByEmployee(String employeeId) {
+    public List<Contract> getContractsByEmployee(Account acc, String employeeId) {
+        AccessControlUtil.checkViewOrDownload(acc, employeeId);
         return repo.findByEmployeeId(employeeId);
     }
 
-    public Contract save(Contract file) {
-        return repo.save(file);
+    public Contract uploadContract(Account acc, String employeeId, MultipartFile file) throws IOException {
+
+        AccessControlUtil.checkViewOrDownload(acc, employeeId);
+
+        if (file.isEmpty()) throw new RuntimeException("File rỗng");
+
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
+            throw new RuntimeException("Chỉ cho phép file PDF");
+        }
+
+        String dir = "uploads/contracts/" + employeeId;
+        String path = dir + "/" + filename;
+
+        Files.createDirectories(Paths.get(dir));
+        Files.copy(file.getInputStream(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+
+        Contract c = new Contract();
+        c.setEmployeeId(employeeId);
+        c.setFileName(filename);
+        c.setFilePath(path);
+
+        return repo.save(c);
     }
 
-    public Contract getById(String id) {
-        return repo.findById(id).orElse(null);
+    public void deleteContract(Account acc, String id) {
+        Contract c = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract không tồn tại"));
+
+        AccessControlUtil.checkViewOrDownload(acc, c.getEmployeeId());
+
+        File f = new File(c.getFilePath());
+        if (f.exists()) f.delete();
+
+        repo.delete(c);
+    }
+
+    public FileSystemResource getFileResource(Account acc, String id) {
+        Contract c = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract không tồn tại"));
+
+        AccessControlUtil.checkViewOrDownload(acc, c.getEmployeeId());
+
+        File file = new File(c.getFilePath());
+        if (!file.exists()) throw new RuntimeException("File không tồn tại");
+
+        return new FileSystemResource(file);
+    }
+
+    public Contract getContractById(String id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract không tồn tại"));
     }
 }

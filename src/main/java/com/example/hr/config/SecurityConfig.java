@@ -33,11 +33,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/login", "/register").permitAll()
                                 .requestMatchers("/css/**", "/js/**").permitAll()
-                                .requestMatchers("/employees/detail/**").hasAnyRole("ADMIN", "HR", "USER")
-                                .requestMatchers("/contracts/employee/**", "/contracts/view/**", "/contracts/download/**", "/accounts/change-password").hasAnyRole("ADMIN", "HR", "USER")
+                                .requestMatchers("/employees/", "/employees/detail/**").hasAnyRole("ADMIN", "HR", "USER")
+                                .requestMatchers("/contracts/", "/contracts/employee/**", "/contracts/view/**", "/contracts/download/**").hasAnyRole("ADMIN", "HR", "USER")
+                                .requestMatchers("/accounts/change-password").hasAnyRole("ADMIN", "HR", "USER")
                                 .requestMatchers("/employees/**", "/contracts/**").hasAnyRole("ADMIN", "HR")
                                 .requestMatchers("/accounts/**").hasRole("ADMIN")
                                 .anyRequest().authenticated());
+                                //-------------
+                                //A08
+                                //-------------
+                                // .anyRequest().permitAll());
+                                //-------------
 
                 http.formLogin(form -> form
                                 .loginPage("/login")

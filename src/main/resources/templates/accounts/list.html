@@ -4,7 +4,7 @@
     <title>Danh sách tài khoản</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Danh sách tài khoản</h2>
 
 <a href="/accounts/add">+ Thêm tài khoản</a>
@@ -42,5 +42,6 @@
 <br/>
 <a href="/home">Về trang chủ</a>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

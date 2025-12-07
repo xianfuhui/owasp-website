@@ -1,61 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <title>Danh sách hợp đồng</title>
-    <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .actions a {
-            margin-right: 10px;
-            text-decoration: none;
-            color: #007bff;
-        }
-
-        .actions a:hover {
-            text-decoration: underline;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <body>
 
     <h2>Danh sách hợp đồng</h2>
 
-    <!-- Form upload file -->
-    <form th:if="${currentAccount.role != 'USER'}" th:action="@{'/contracts/upload/' + ${employeeId}}" method="post"
-        enctype="multipart/form-data">
+    <!-- Form upload file (chỉ hiện với ADMIN) -->
+    <form sec:authorize="hasRole('ADMIN')" 
+          th:action="@{'/contracts/upload/' + ${employeeId}}" 
+          method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <button type="submit">Upload</button>
     </form>
-
-    <!-- Hiển thị thông báo -->
-    <div th:if="${param.success}" style="color: green;">
-        <p th:text="${param.success}"></p>
-    </div>
-    <div th:if="${param.error}" style="color: red;">
-        <p th:text="${param.error}"></p>
-    </div>
 
     <!-- Bảng danh sách hợp đồng -->
     <table>
@@ -68,11 +30,12 @@
         <tbody>
             <tr th:each="c : ${contracts}">
                 <td th:text="${c.fileName}"></td>
-                <td class="actions">
+                <td>
                     <a th:href="@{'/contracts/view/' + ${c.id}}" target="_blank">Xem</a>
                     <a th:href="@{'/contracts/download/' + ${c.id}}">Tải</a>
-                    <a th:if="${currentAccount.role != 'USER'}" th:href="@{'/contracts/delete/' + ${c.id}}"
-                        onclick="return confirm('Bạn có chắc muốn xóa file này?');">Xóa</a>
+                    <a sec:authorize="hasRole('ADMIN')" 
+                       th:href="@{'/contracts/delete/' + ${c.id}}"
+                       onclick="return confirm('Bạn có chắc muốn xóa file này?');">Xóa</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(contracts)}">
@@ -80,6 +43,8 @@
             </tr>
         </tbody>
     </table>
+
+    <div th:replace="~{fragments/messages :: messages}"></div>
 
 </body>
 

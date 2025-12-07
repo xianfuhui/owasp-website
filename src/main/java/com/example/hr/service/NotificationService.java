@@ -1,12 +1,10 @@
 package com.example.hr.service;
 
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.util.Properties;
+import com.example.hr.entity.Employee;
 
 @Service
 public class NotificationService {
@@ -17,35 +15,7 @@ public class NotificationService {
         this.mailSender = mailSender;
     }
 
-    // ===============================
-    // 1) Vulnerable version
-    // ===============================
-    public String sendMailVulnerable(String to, String subject, String msg) {
-        try {
-            // THƯ VIỆN CŨ -> chứa nhiều CVE
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.unsafe-legacy.com");
-
-            Session session = Session.getInstance(props);
-            MimeMessage message = new MimeMessage(session);
-
-            // Không validate input -> CRLF Injection
-            message.setFrom("noreply@example.com");
-            message.addRecipients(jakarta.mail.Message.RecipientType.TO, to);
-            message.setSubject(subject);
-            message.setText(msg);
-
-            jakarta.mail.Transport.send(message);
-            return "Sent using vulnerable method";
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
-    }
-
-    // ===============================
-    // 2) Secure version
-    // ===============================
-    public String sendMailSafe(String to, String subject, String text) {
+    public String sendMail(String to, String subject, String text) {
         try {
 
             // Chặn header injection
@@ -62,6 +32,47 @@ public class NotificationService {
             mailSender.send(mail);
 
             return "Sent securely";
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    public String sendMailToMultiple(String[] emails, String subject, String text) {
+        try {
+            for (String email : emails) {
+                email = email.trim();
+                if (email.isEmpty() || email.contains("\n") || email.contains("\r")) continue;
+
+                SimpleMailMessage mail = new SimpleMailMessage();
+                mail.setTo(email);
+                mail.setSubject(subject.trim());
+                mail.setText(text);
+                mail.setFrom("noreply@example.com");
+
+                mailSender.send(mail);
+            }
+            return "Sent to selected employees successfully";
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    public String sendMailToAll(Iterable<Employee> employees, String subject, String text) {
+        try {
+            for (Employee e : employees) {
+                String email = e.getEmail();
+                // Chặn header injection
+                if (email == null || email.contains("\n") || email.contains("\r")) continue;
+
+                SimpleMailMessage mail = new SimpleMailMessage();
+                mail.setTo(email);
+                mail.setSubject(subject.trim());
+                mail.setText(text);
+                mail.setFrom("noreply@example.com");
+
+                mailSender.send(mail);
+            }
+            return "Sent to all employees successfully";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }

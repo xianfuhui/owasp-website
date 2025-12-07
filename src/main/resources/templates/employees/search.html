@@ -4,7 +4,7 @@
     <title>Tìm kiếm nhân viên</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Tìm kiếm nhân viên</h2>
 
 <form action="/employees/search-vulnerable" method="get">
@@ -12,7 +12,7 @@
     <button type="submit">Search (Vulnerable)</button>
 </form>
 
-<form action="/employees/search-safe" method="get">
+<form action="/employees/search" method="get">
     <input type="text" name="q" placeholder="Search name...">
     <button type="submit">Search (Safe)</button>
 </form>
@@ -31,6 +31,8 @@
 
 
 <a href="/employees">Quay lại</a>
+
+<div th:replace="~{fragments/messages :: messages}"></div>
 
 </body>
 </html>

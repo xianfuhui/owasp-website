@@ -173,4 +173,8 @@ public class AccountService implements UserDetailsService {
     public Account getByUsername(String username) {
         return repo.findByUsername(username);
     }
+
+    public List<Account> getListByEmployeeId(String employeeId) {
+    return repo.findAllByEmployeeId(employeeId);
+}
 }

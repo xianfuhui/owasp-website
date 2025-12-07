@@ -4,13 +4,10 @@
     <title>Thêm tài khoản</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Thêm tài khoản</h2>
 
 <form th:action="@{/accounts/add}" th:object="${account}" method="post">
-    <div th:if="${errorMessage}" style="color:red">
-        <p th:text="${errorMessage}"></p>
-    </div>
 
     Username: <input type="text" th:field="*{username}"/><br/><br/>
 
@@ -53,5 +50,6 @@
 <br/>
 <a href="/accounts/list">Quay lại</a>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

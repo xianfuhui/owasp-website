@@ -4,7 +4,7 @@
     <title>Sửa tài khoản</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Sửa tài khoản</h2>
 
 <form th:action="@{|/accounts/edit/${account.id}|}" th:object="${account}" method="post">
@@ -37,8 +37,17 @@
     <button type="submit">Cập nhật</button>
 </form>
 
+<div th:if="${errorMessage}" style="color:red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<div th:if="${successMessage}" style="color:green;">
+    <p th:text="${successMessage}"></p>
+</div>
+
 <br/>
 <a href="/accounts/list">Quay lại</a>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

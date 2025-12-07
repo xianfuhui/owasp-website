@@ -1,0 +1,46 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"><title>Send Safe</title></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<h2>Gửi mail (Secure)</h2>
+
+<form method="post" th:action="@{/notifications/send-mail}">
+    <label>Lựa chọn gửi:</label><br>
+    <select name="sendOption" id="sendOption" onchange="toggleEmailField()">
+        <option value="single">Gửi cho 1 nhân viên</option>
+        <option value="some">Gửi cho một số nhân viên</option>
+        <option value="all">Gửi cho tất cả nhân viên</option>
+    </select><br><br>
+
+    <div id="emailField">
+        <label>Email nhận (nếu gửi 1 hoặc nhiều nhân viên, ngăn cách bằng dấu ,):</label><br>
+        <input type="text" name="to"><br><br>
+    </div>
+
+    <label>Subject:</label><br>
+    <input type="text" name="subject" required><br><br>
+
+    <label>Message:</label><br>
+    <textarea name="message" required></textarea><br><br>
+
+    <button type="submit">Gửi mail</button>
+</form>
+
+<p th:text="${status}"></p>
+
+<script>
+    function toggleEmailField() {
+        const option = document.getElementById('sendOption').value;
+        const emailField = document.getElementById('emailField');
+        emailField.style.display = (option === 'all') ? 'none' : 'block';
+    }
+
+    toggleEmailField(); // Ẩn/hiện ngay khi load trang
+</script>
+
+<div th:replace="~{fragments/messages :: messages}"></div>
+
+</body>
+</html>

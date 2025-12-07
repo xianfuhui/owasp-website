@@ -4,36 +4,34 @@ import com.example.hr.entity.Account;
 import com.example.hr.entity.Employee;
 import com.example.hr.service.AccountService;
 import com.example.hr.service.EmployeeService;
-import com.example.hr.service.ActivityLogService;
-
-import java.util.List;
-
 import com.example.hr.util.AccessControlUtil;
 import com.example.hr.util.SecurityUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/employees")
 public class EmployeeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     private final EmployeeService service;
     private final AccountService accountService;
-    private final ActivityLogService logService;
 
     public EmployeeController(EmployeeService service,
-                              AccountService accountService,
-                              ActivityLogService logService) {
+                              AccountService accountService) {
         this.service = service;
         this.accountService = accountService;
-        this.logService = logService;
     }
 
-    // ============================
-    // Utility để diff dữ liệu update
-    // ============================
     private String diff(Employee oldEmp, Employee newEmp) {
         StringBuilder sb = new StringBuilder();
         compare(sb, "fullName", oldEmp.getFullName(), newEmp.getFullName());
@@ -55,13 +53,18 @@ public class EmployeeController {
         }
     }
 
-    // ============================
-    // Controller
-    // ============================
-
     @GetMapping("/list")
     public String list(Model model) {
-        model.addAttribute("employees", service.getAll());
+        String user = SecurityUtil.getCurrentUsername();
+        logger.info("User {} requested employee list", user);
+
+        try {
+            model.addAttribute("employees", service.getAll());
+        } catch (RuntimeException e) {
+            logger.error("Error listing employees by {}: {}", user, e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
+
         return "employees/list";
     }
 
@@ -72,32 +75,39 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public String add(@ModelAttribute Employee emp) {
-        service.create(emp);
-
-        logService.log(
-            "CREATE",
-            "Created employee: " + emp.getFullName(),
-            "system"
-        );
+    public String add(@ModelAttribute Employee emp, Model model) {
+        String user = SecurityUtil.getCurrentUsername();
+        try {
+            Employee created = service.create(emp);
+            logger.info("Employee {} created by {}", created.getId(), user);
+            model.addAttribute("successMessage", "Tạo nhân viên thành công!");
+        } catch (RuntimeException e) {
+            logger.error("Error creating employee by {}: {}", user, e.getMessage());
+            model.addAttribute("employee", emp);
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "employees/add";
+        }
 
         return "redirect:/employees/list";
     }
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable String id, Model model) {
+        String user = SecurityUtil.getCurrentUsername();
+        try {
+            Employee emp = service.getById(id);
+            if (emp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
-        Employee emp = service.getById(id);
-        if (emp == null) return "redirect:/employees";
+            Account acc = accountService.getByEmployeeId(id);
 
-        Account acc = null;
-        if (emp.getId() != null) {
-            acc = accountService.getByEmployeeId(emp.getId());
+            model.addAttribute("employee", emp);
+            model.addAttribute("account", acc);
+            model.addAttribute("roles", List.of("EMPLOYEE", "HR", "ADMIN"));
+        } catch (RuntimeException e) {
+            logger.error("Error opening edit form for employee {} by {}: {}", id, user, e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "redirect:/employees/list";
         }
-
-        model.addAttribute("employee", emp);
-        model.addAttribute("account", acc);
-        model.addAttribute("roles", List.of("EMPLOYEE", "HR", "ADMIN"));
 
         return "employees/edit";
     }
@@ -105,98 +115,135 @@ public class EmployeeController {
     @PostMapping("/edit/{id}")
     public String edit(@PathVariable String id,
                        @ModelAttribute Employee emp,
-                       @RequestParam("role") String role) {
+                       @RequestParam("role") String role,
+                       Model model) {
 
-        Employee oldEmp = service.getById(id);
-        String changes = diff(oldEmp, emp);
+        String user = SecurityUtil.getCurrentUsername();
+        try {
+            Employee oldEmp = service.getById(id);
+            if (oldEmp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
-        service.update(id, emp, role);
+            String changes = diff(oldEmp, emp);
+            service.update(id, emp, role);
 
-        logService.log(
-            "UPDATE",
-            "Employee " + id + " updated. Changes: " + changes,
-            "system"
-        );
+            logger.info("Employee {} updated by {}. Changes: {}", id, user, changes);
+            model.addAttribute("successMessage", "Cập nhật nhân viên thành công!");
+        } catch (RuntimeException e) {
+            logger.error("Error updating employee {} by {}: {}", id, user, e.getMessage());
+            model.addAttribute("employee", emp);
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "employees/edit";
+        }
 
-        return "redirect:/employees";
+        return "employees/edit";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable String id) {
-        service.delete(id);
+    public String delete(@PathVariable String id, Model model) {
+        String user = SecurityUtil.getCurrentUsername();
+        try {
+            boolean deleted = service.delete(id);
+            if (!deleted) throw new RuntimeException("Nhân viên không tồn tại");
 
-        logService.log(
-            "DELETE",
-            "Deleted employee: " + id,
-            "system"
-        );
+            logger.info("Employee {} deleted by {}", id, user);
+            model.addAttribute("successMessage", "Xóa nhân viên thành công!");
+        } catch (RuntimeException e) {
+            logger.error("Error deleting employee {} by {}: {}", id, user, e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
 
-        return "redirect:/employees";
+        return "redirect:/employees/list";
     }
 
     @GetMapping("/detail/{id}")
     public String getEmployeeDetail(@PathVariable String id, Model model) {
+        String username = SecurityUtil.getCurrentUsername();
+        try {
+            Account currentAccount = accountService.getByUsername(username);
+            AccessControlUtil.checkViewOrDownload(currentAccount, id);
 
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        Account currentAccount = accountService.getByUsername(currentUsername);
+            Employee emp = service.getById(id);
+            if (emp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
-        // Kiểm tra quyền: ADMIN/HR xem tất cả, USER chỉ xem chính mình
-        AccessControlUtil.checkViewOrDownload(currentAccount, id);
+            model.addAttribute("employee", emp);
+        } catch (RuntimeException e) {
+            logger.error("Error viewing employee {} by {}: {}", id, username, e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "redirect:/employees/list";
+        }
 
-        Employee emp = service.getById(id);
-        model.addAttribute("employee", emp);
+        return "employees/detail";
+    }
+
+    @GetMapping("/")
+    public String getCurrentEmployeeDetail(@AuthenticationPrincipal UserDetails user, Model model) {
+        try {
+            Account currentAccount = accountService.getByUsername(user.getUsername());
+            if (currentAccount == null || currentAccount.getEmployeeId() == null) {
+                throw new RuntimeException("Không tìm thấy thông tin nhân viên cho tài khoản hiện tại");
+            }
+
+            Employee emp = service.getById(currentAccount.getEmployeeId());
+            if (emp == null) {
+                throw new RuntimeException("Nhân viên không tồn tại");
+            }
+
+            model.addAttribute("employee", emp);
+
+        } catch (RuntimeException e) {
+            logger.error("Error viewing current employee info for {}: {}", user.getUsername(), e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "redirect:/employees/list";
+        }
 
         return "employees/detail";
     }
 
     @GetMapping("/accounts/{employeeId}")
     public String accountsOfEmployee(@PathVariable String employeeId, Model model) {
+        String user = SecurityUtil.getCurrentUsername();
+        try {
+            Employee emp = service.getById(employeeId);
+            if (emp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
-        // Lấy employee
-        Employee emp = service.getById(employeeId);
-        if (emp == null) {
+            List<Account> accs = accountService.getListByEmployeeId(employeeId);
+
+            model.addAttribute("employee", emp);
+            model.addAttribute("accounts", accs);
+            model.addAttribute("currentAccount", accountService.getByUsername(SecurityUtil.getCurrentUsername()));
+        } catch (RuntimeException e) {
+            logger.error("Error fetching accounts for employee {} by {}: {}", employeeId, user, e.getMessage());
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/employees/list";
         }
 
-        // Lấy danh sách account của employee
-        Account acc = accountService.getByEmployeeId(employeeId);
-
-        model.addAttribute("employee", emp);
-        model.addAttribute("account", acc);
-
-        return "employees/accounts"; // view mới
+        return "employees/accounts";
     }
 
     @GetMapping("/search")
     public String showSearch() {
-        return "employees/search"; 
+        return "employees/search";
     }
 
     @GetMapping("/search-vulnerable")
     public String searchVuln(@RequestParam(value = "q", required = false) String q, Model model) {
-
-        logService.log(
-            "SEARCH",
-            "Search vulnerable with query: " + q,
-            "system"
-        );
-
-        List<Employee> list = service.searchVulnerable(q);
-        model.addAttribute("employees", list);
+        try {
+            List<Employee> list = service.searchVulnerable(q);
+            model.addAttribute("employees", list);
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
         return "employees/search";
     }
 
     @GetMapping("/search-safe")
     public String searchSafe(@RequestParam(value = "q", required = false) String q, Model model) {
-
-        logService.log(
-            "SEARCH",
-            "Search safe with query: " + q,
-            "system"
-        );
-
-        List<Employee> list = service.searchSafe(q);
-        model.addAttribute("employees", list);
+        try {
+            List<Employee> list = service.searchSafe(q);
+            model.addAttribute("employees", list);
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        }
         return "employees/search";
     }
 }

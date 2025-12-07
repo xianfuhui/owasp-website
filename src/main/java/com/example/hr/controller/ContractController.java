@@ -2,15 +2,21 @@ package com.example.hr.controller;
 
 import com.example.hr.entity.Account;
 import com.example.hr.entity.Contract;
-import com.example.hr.repository.ContractRepository;
 import com.example.hr.service.AccountService;
-import com.example.hr.util.AccessControlUtil;
+import com.example.hr.service.ContractService;
 import com.example.hr.util.SecurityUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +24,57 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
 
 @Controller
 @RequestMapping("/contracts")
 public class ContractController {
 
-    private final ContractRepository repo;
+    private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
+
+    private final ContractService contractService;
     private final AccountService accountService;
 
-    public ContractController(ContractRepository repo, AccountService accountService) {
-        this.repo = repo;
+    public ContractController(ContractService contractService, AccountService accountService) {
+        this.contractService = contractService;
         this.accountService = accountService;
     }
 
-    // =========================
-    // 1. List contract by employee
-    // =========================
-    @GetMapping("/employee/{employeeId}")
+    // ============================================
+    // USER xem hợp đồng của chính họ
+    // ============================================
+    @GetMapping("/")
+    public String myContracts(@AuthenticationPrincipal UserDetails user, Model model) {
+
+        logger.info("[ACTION=VIEW_MY_CONTRACTS] user={} IP=?", user.getUsername());
+
+        Account currentAccount = accountService.getByUsername(user.getUsername());
+        List<Contract> files = contractService.getContractsByEmployee(currentAccount, currentAccount.getEmployeeId());
+
+        logger.info("[RESULT=FOUND_CONTRACTS] user={} employeeId={} total={}",
+                user.getUsername(), currentAccount.getEmployeeId(), files.size());
+
+        model.addAttribute("contracts", files);
+        model.addAttribute("employeeId", currentAccount.getEmployeeId());
+        model.addAttribute("currentAccount", currentAccount);
+
+        return "contracts/list";
+    }
+
+    // ============================================
+    // ADMIN/HR xem hợp đồng của nhân viên
+    // ============================================
+    @GetMapping("/list/{employeeId}")
     public String listByEmployee(@PathVariable String employeeId, Model model) {
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        Account currentAccount = accountService.getByUsername(currentUsername);
 
-        // Kiểm tra quyền: ADMIN/HR xem tất cả, USER chỉ xem chính mình
-        AccessControlUtil.checkViewOrDownload(currentAccount, employeeId);
+        String username = SecurityUtil.getCurrentUsername();
+        logger.info("[ACTION=ADMIN_VIEW] admin={} targetEmployee={}", username, employeeId);
 
-        List<Contract> files = repo.findByEmployeeId(employeeId);
+        Account currentAccount = accountService.getByUsername(username);
+        List<Contract> files = contractService.getContractsByEmployee(currentAccount, employeeId);
+
+        logger.info("[RESULT=FOUND_CONTRACTS] admin={} employeeId={} total={}",
+                username, employeeId, files.size());
 
         model.addAttribute("contracts", files);
         model.addAttribute("employeeId", employeeId);
@@ -53,121 +83,96 @@ public class ContractController {
         return "contracts/list";
     }
 
-    // =========================
-    // 2. Upload file (100% relative path)
-    // =========================
+    // ============================================
+    // Upload hợp đồng
+    // ============================================
     @PostMapping("/upload/{employeeId}")
-    public String uploadContract(@PathVariable String employeeId,
-                                 @RequestParam("file") MultipartFile file) throws IOException {
+    public String uploadContract(
+            @PathVariable String employeeId,
+            @RequestParam("file") MultipartFile file) throws IOException {
 
-        if (file.isEmpty()) {
-            return "redirect:/contracts/employee/" + employeeId + "?error=empty";
-        }
+        String username = SecurityUtil.getCurrentUsername();
+        logger.info("[ACTION=UPLOAD] user={} targetEmployee={} filename={} size={}",
+                username, employeeId, file.getOriginalFilename(), file.getSize());
 
-        String relativeDir = "uploads/contracts/" + employeeId;
-        String relativeFile = relativeDir + "/" + file.getOriginalFilename();
+        Account currentAccount = accountService.getByUsername(username);
 
-        Path dirPath = Paths.get(relativeDir);
-        Files.createDirectories(dirPath);
+        Contract saved = contractService.uploadContract(currentAccount, employeeId, file);
 
-        Path filePath = Paths.get(relativeFile);
+        logger.info("[RESULT=UPLOAD_SUCCESS] user={} employeeId={} savedPath={}",
+                username, employeeId, saved.getFilePath());
 
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        Contract contract = new Contract();
-        contract.setEmployeeId(employeeId);
-        contract.setFileName(file.getOriginalFilename());
-        contract.setFilePath(relativeFile); // DB only stores relative path
-
-        repo.save(contract);
-
-        return "redirect:/contracts/employee/" + employeeId + "?success=uploaded";
+        return "redirect:/contracts/list/" + employeeId;
     }
 
-    // =========================
-    // 3. Download file (relative only)
-    // =========================
-    @GetMapping("/download/{id}")
-    public ResponseEntity<FileSystemResource> downloadContract(@PathVariable String id) throws IOException {
-
-        Contract contract = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contract not found"));
-
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        Account currentAccount = accountService.getByUsername(currentUsername);
-
-        // Kiểm tra quyền: ADMIN/HR xem tất cả, USER chỉ xem chính mình
-        AccessControlUtil.checkViewOrDownload(currentAccount, contract.getEmployeeId());
-
-        Path path = Paths.get(contract.getFilePath());
-        File file = path.toFile();
-
-        if (!file.exists()) {
-            throw new RuntimeException("File not found: " + contract.getFilePath());
-        }
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + contract.getFileName() + "\"")
-                .contentLength(file.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new FileSystemResource(file));
-    }
-
-    // =========================
-    // 4. Delete file (relative)
-    // =========================
+    // ============================================
+    // Xóa hợp đồng
+    // ============================================
     @GetMapping("/delete/{id}")
     public String deleteContract(@PathVariable String id) {
 
-        Contract contract = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contract not found"));
+        String username = SecurityUtil.getCurrentUsername();
+        logger.info("[ACTION=DELETE] user={} contractId={}", username, id);
 
-        Path path = Paths.get(contract.getFilePath());
-        File file = path.toFile();
+        Account currentAccount = accountService.getByUsername(username);
 
-        if (file.exists()) {
-            file.delete();
-        }
+        Contract c = contractService.getContractById(id);
 
-        repo.delete(contract);
+        logger.info("[INFO=DELETE_TARGET] user={} employeeId={} fileName={}",
+                username, c.getEmployeeId(), c.getFileName());
 
-        return "redirect:/contracts/employee/" + contract.getEmployeeId() + "?success=deleted";
+        contractService.deleteContract(currentAccount, id);
+
+        logger.info("[RESULT=DELETE_SUCCESS] user={} removedId={}", username, id);
+
+        return "redirect:/contracts/list/" + c.getEmployeeId();
     }
 
-    // =========================
-    // 5. View file inline (relative)
-    // =========================
-    @GetMapping("/view/{id}")
-    public ResponseEntity<FileSystemResource> viewContract(@PathVariable String id) throws IOException {
+    // ============================================
+    // Download PDF
+    // ============================================
+    @GetMapping("/download/{id}")
+    public ResponseEntity<FileSystemResource> download(@PathVariable String id) throws IOException {
 
-        Contract contract = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contract not found"));
+        String username = SecurityUtil.getCurrentUsername();
+        logger.info("[ACTION=DOWNLOAD] user={} contractId={}", username, id);
 
+        Account currentAccount = accountService.getByUsername(username);
 
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        Account currentAccount = accountService.getByUsername(currentUsername);
+        FileSystemResource resource = contractService.getFileResource(currentAccount, id);
+        File file = resource.getFile();
 
-        // Kiểm tra quyền: ADMIN/HR xem tất cả, USER chỉ xem chính mình
-        AccessControlUtil.checkViewOrDownload(currentAccount, contract.getEmployeeId());
-
-        Path path = Paths.get(contract.getFilePath());
-        File file = path.toFile();
-
-        if (!file.exists()) {
-            throw new RuntimeException("File not found: " + contract.getFilePath());
-        }
-
-        String contentType = Files.probeContentType(file.toPath());
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+        logger.info("[CHECK=FILE] user={} path={} exists={}",
+                username, file.getAbsolutePath(), file.exists());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + contract.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
                 .contentLength(file.length())
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(new FileSystemResource(file));
+                .body(resource);
+    }
+
+    // ============================================
+    // View PDF trực tiếp
+    // ============================================
+    @GetMapping("/view/{id}")
+    public ResponseEntity<FileSystemResource> view(@PathVariable String id) throws IOException {
+
+        String username = SecurityUtil.getCurrentUsername();
+        logger.info("[ACTION=VIEW_PDF] user={} contractId={}", username, id);
+
+        Account currentAccount = accountService.getByUsername(username);
+
+        FileSystemResource resource = contractService.getFileResource(currentAccount, id);
+        File file = resource.getFile();
+
+        logger.info("[CHECK=FILE] user={} path={} exists={}",
+                username, file.getAbsolutePath(), file.exists());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(file.length())
+                .body(resource);
     }
 }

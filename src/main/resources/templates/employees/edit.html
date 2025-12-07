@@ -5,7 +5,7 @@
     <title>Sửa nhân viên</title>
 </head>
 <body>
-
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <h2>Sửa nhân viên</h2>
 
 <form th:action="@{/employees/edit/{id}(id=${employee.id})}"
@@ -34,5 +34,6 @@
 
 <a href="/employees">Quay lại</a>
 
+<div th:replace="~{fragments/messages :: messages}"></div>
 </body>
 </html>

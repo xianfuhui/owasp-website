@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Upload Avatar</title>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<h2>Upload Avatar qua URL</h2>
+
+<form th:action="@{/employees/avatars/upload-avatar}" method="post">
+
+    <label>Employee ID:</label>
+    <input type="text" name="employeeId" required>
+    <br><br>
+
+    <label>Image URL:</label>
+    <input type="text" name="imageUrl" placeholder="http://example.com/avatar.png" required>
+    <br><br>
+
+    <button type="submit">Upload</button>
+
+</form>
+
+<div th:replace="~{fragments/messages :: messages}"></div>
+</body>
+</html>

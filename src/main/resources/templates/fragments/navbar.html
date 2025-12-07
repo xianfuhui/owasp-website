@@ -1,0 +1,66 @@
+<!-- templates/fragments/navbar.html -->
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     th:fragment="navbar">
+    <nav style="background-color:#333; overflow:hidden; padding:0 10px;">
+        <div class="dropdown" sec:authorize="hasAnyRole('USER','HR','ADMIN')" style="float:left; overflow:hidden;">
+            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
+                Profile ▼
+            </button>
+            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
+                <a th:href="@{/employees/}" style="color:white; padding:12px 16px; display:block;">Xem chi tiết</a>
+                <a th:href="@{/accounts/change-password}" style="color:white; padding:12px 16px; display:block;">Đổi mật khẩu</a>
+            </div>
+        </div>
+
+        <!-- Employees Dropdown (HR & ADMIN) -->
+        <div class="dropdown" sec:authorize="hasAnyRole('HR','ADMIN')" style="float:left; overflow:hidden;">
+            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
+                Employees ▼
+            </button>
+            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
+                <a th:href="@{/employees/list}" style="color:white; padding:12px 16px; display:block;">Danh sách</a>
+                <a th:href="@{/employees/add}" style="color:white; padding:12px 16px; display:block;">Thêm mới</a>
+                <a th:href="@{/employees/import}" style="color:white; padding:12px 16px; display:block;">Thêm từ excel</a>
+                <a th:href="@{/employees/avatars/upload-avatar}" style="color:white; padding:12px 16px; display:block;">Upload Avatar</a>
+                <a th:href="@{/employees/search}" style="color:white; padding:12px 16px; display:block;">Search</a>
+            </div>
+        </div>
+
+        <!-- Accounts Dropdown (ADMIN) -->
+        <div class="dropdown" sec:authorize="hasRole('ADMIN')" style="float:left; overflow:hidden;">
+            <button class="dropdown-btn" style="color:white; padding:12px 16px; background:none; border:none; cursor:pointer;">
+                Accounts ▼
+            </button>
+            <div class="dropdown-content" style="display:none; position:absolute; background-color:#444; min-width:160px; z-index:1;">
+                <a th:href="@{/accounts/list}" style="color:white; padding:12px 16px; display:block;">Danh sách</a>
+                <a th:href="@{/accounts/add}" style="color:white; padding:12px 16px; display:block;">Thêm mới</a>
+            </div>
+        </div>
+
+        <!-- Home -->
+        <a th:href="@{/home}" style="color:white; padding:12px 16px; text-decoration:none;">Home</a>
+
+        <!-- Contracts -->
+        <a th:href="@{/contracts/}" style="color:white; padding:12px 16px; text-decoration:none;">Contracts</a>
+
+        <!-- Notifications -->
+        <a th:href="@{/notifications/send-mail}" sec:authorize="hasAnyRole('HR','ADMIN')" style="color:white; padding:12px 16px; text-decoration:none;">Notifications</a>
+
+        <!-- Logout -->
+        <a th:href="@{/logout}" style="color:white; padding:12px 16px; text-decoration:none;">Logout</a>
+    </nav>
+
+    <script>
+        // dropdown hover
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dd => {
+            dd.addEventListener('mouseover', () => {
+                dd.querySelector('.dropdown-content').style.display = 'block';
+            });
+            dd.addEventListener('mouseout', () => {
+                dd.querySelector('.dropdown-content').style.display = 'none';
+            });
+        });
+    </script>
+</div>
