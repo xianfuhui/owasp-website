@@ -158,7 +158,7 @@ public class EmployeeController {
             Account currentAccount = accountService.getByUsername(username);
             //-------------
             //A01 – Broken Access Control 
-            // AccessControlUtil.checkViewOrDownload(currentAccount, id);
+            AccessControlUtil.checkViewOrDownload(currentAccount, id);
             // -------------
 
             Employee emp = service.getById(id);

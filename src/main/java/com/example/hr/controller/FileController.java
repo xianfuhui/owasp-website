@@ -1,5 +1,5 @@
-//-------------
-//A05 – Security Misconfiguration
+// -------------
+// A05 – Security Misconfiguration
 // -------------
 package com.example.hr.controller;
 
