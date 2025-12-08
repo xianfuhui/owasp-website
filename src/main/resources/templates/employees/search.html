@@ -208,7 +208,7 @@
                         <span>Tìm kiếm an toàn</span>
                     </h3>
                     <p class="search-method-desc">Phương pháp tìm kiếm được bảo mật, sử dụng parameterized queries</p>
-                    <form action="/employees/search" method="get" class="search-form">
+                    <form action="/employees/search-safe" method="get" class="search-form">
                         <input 
                             type="text" 
                             name="q" 
@@ -223,7 +223,9 @@
                     </form>
                 </div>
 
-                <!-- Vulnerable Search (for testing) -->
+                <!-- -------------
+                 A03 – Injection
+                 ------------- -->
                 <div class="search-method-card" style="border: 2px solid var(--color-warning);">
                     <h3 class="search-method-title">
                         <img th:src="@{/icons/alert-circle.svg}" alt="" class="icon" style="color: var(--color-warning);">
@@ -244,6 +246,7 @@
                         </button>
                     </form>
                 </div>
+                <!-- Vulnerable Search (for testing) -->
             </div>
         </div>
 

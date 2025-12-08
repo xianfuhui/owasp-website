@@ -88,9 +88,11 @@ public class AvatarService {
         }
     }
 
+    //-------------
+    //A10 - SSRF
+    //-------------
     public String uploadFromUrlvulnerable(String employeeId, String imageUrl) {
         try {
-
             // Cố tình không kiểm tra domain → dễ bị SSRF
             URL url = new URL(imageUrl);
 

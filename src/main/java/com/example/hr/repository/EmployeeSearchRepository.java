@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.*;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Repository
 public class EmployeeSearchRepository {
@@ -30,9 +30,10 @@ public class EmployeeSearchRepository {
 
     // SECURE — phiên bản đã fix
     public List<Employee> searchSafe(String keyword) {
+        String safe = Pattern.quote(keyword);
 
         Query query = new Query(
-                Criteria.where("fullName").regex(keyword, "i") // Prepared
+            Criteria.where("fullName").regex(safe, "i")
         );
 
         return mongoTemplate.find(query, Employee.class);

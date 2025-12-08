@@ -1,0 +1,9 @@
+[{
+  "_id": "emp000",
+  "fullName": "Administrator",
+  "email": "admin@example.com",
+  "phone": "0123456789",
+  "position": "System Admin",
+  "salary": 0,
+  "avatarPath": "/avatars/admin.png"
+}]

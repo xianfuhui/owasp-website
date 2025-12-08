@@ -98,10 +98,7 @@ public class EmployeeController {
             Employee emp = service.getById(id);
             if (emp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
-            Account acc = accountService.getByEmployeeId(id);
-
             model.addAttribute("employee", emp);
-            model.addAttribute("account", acc);
             model.addAttribute("roles", List.of("EMPLOYEE", "HR", "ADMIN"));
         } catch (RuntimeException e) {
             logger.error("Error opening edit form for employee {} by {}: {}", id, user, e.getMessage());
@@ -115,7 +112,6 @@ public class EmployeeController {
     @PostMapping("/edit/{id}")
     public String edit(@PathVariable String id,
                        @ModelAttribute Employee emp,
-                       @RequestParam("role") String role,
                        Model model) {
 
         String user = SecurityUtil.getCurrentUsername();
@@ -124,7 +120,7 @@ public class EmployeeController {
             if (oldEmp == null) throw new RuntimeException("Nhân viên không tồn tại");
 
             String changes = diff(oldEmp, emp);
-            service.update(id, emp, role);
+            service.update(id, emp);
 
             logger.info("Employee {} updated by {}. Changes: {}", id, user, changes);
             model.addAttribute("successMessage", "Cập nhật nhân viên thành công!");
@@ -160,7 +156,10 @@ public class EmployeeController {
         String username = SecurityUtil.getCurrentUsername();
         try {
             Account currentAccount = accountService.getByUsername(username);
-            AccessControlUtil.checkViewOrDownload(currentAccount, id);
+            //-------------
+            //A01 – Broken Access Control 
+            // AccessControlUtil.checkViewOrDownload(currentAccount, id);
+            // -------------
 
             Employee emp = service.getById(id);
             if (emp == null) throw new RuntimeException("Nhân viên không tồn tại");

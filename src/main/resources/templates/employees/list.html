@@ -170,6 +170,7 @@
                 <table class="table" id="employeeTable">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Họ tên</th>
                             <th>Email</th>
                             <th>Điện thoại</th>
@@ -193,6 +194,12 @@
                             </td>
                         </tr>
                         <tr th:each="e : ${employees}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <img th:src="@{/icons/phone.svg}" alt="" class="icon icon-sm" style="color: var(--color-text-tertiary);">
+                                    <strong th:text="${e.id}">emp000</strong>
+                                </div>
+                            </td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-accent-light) 100%); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--color-primary);">

@@ -1,0 +1,12 @@
+[{
+  "_id": {
+    "$oid": "6935df07f6874cade480d7af"
+  },
+  "employeeId": "emp000",
+  "username": "admin",
+  "password": "$2a$10$7ypGIiyk/muwntsEmGxKzulNrHSVE5tVF14R1HuFe218KS7VP.ntG",
+  "role": "ADMIN",
+  "failedAttempts": 0,
+  "locked": false,
+  "lockUntil": 0
+}]

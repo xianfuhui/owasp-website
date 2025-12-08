@@ -24,30 +24,35 @@ public class SecurityConfig {
 
                 http
                 //-------------
-                //A02
+                //A02 – Cryptographic Failures
                 //-------------
                 // .requiresChannel(channel ->
                 //         channel.anyRequest().requiresSecure()
                 // )
-                //-------------
+                //-------------safe:1
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/login", "/register").permitAll()
+                                .requestMatchers("/internal/config").permitAll()
+                                .requestMatchers("/login").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/icons/**").permitAll()
                                 .requestMatchers("/employees/", "/employees/detail/**").hasAnyRole("ADMIN", "HR", "USER")
                                 .requestMatchers("/contracts/", "/contracts/list/**", "/contracts/view/**", "/contracts/download/**").hasAnyRole("ADMIN", "HR", "USER")
                                 .requestMatchers("/accounts/change-password").hasAnyRole("ADMIN", "HR", "USER")
                                 .requestMatchers("/employees/**", "/contracts/**").hasAnyRole("ADMIN", "HR")
+                                //-------------
+                                //A04 – Insecure Design
+                                //-------------
                                 .requestMatchers("/accounts/**").hasRole("ADMIN")
+                                //-------------
                                 .anyRequest().authenticated());
-                                //-------------
-                                //A08
-                                //-------------
+                                
                                 // .anyRequest().permitAll());
-                                //-------------
 
                 http.formLogin(form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/doLogin")
+                                //-------------
+                                //A07 – Authentication Failures
+                                //-------------
                                 .failureHandler((req, res, ex) -> {
                                         String username = req.getParameter("username");
 
@@ -64,6 +69,7 @@ public class SecurityConfig {
 
                                         res.sendRedirect("/login?error=true");
                                 })
+                                //-------------
                                 .successHandler((req, res, auth) -> {
                                         accountService.resetAttempts(auth.getName());
                                         res.sendRedirect("/home");

@@ -25,7 +25,10 @@ public class AuthController {
     // Login / Home / Logout
     // ============================
     @GetMapping("/login")
-    public String showLogin() {
+    public String showLogin(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            return "redirect:/home";
+        }
         return "login";
     }
 

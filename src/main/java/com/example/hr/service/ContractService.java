@@ -24,20 +24,28 @@ public class ContractService {
     }
 
     public List<Contract> getContractsByEmployee(Account acc, String employeeId) {
+        //-------------
+        //A01 – Broken Access Control 
+        // -------------
         AccessControlUtil.checkViewOrDownload(acc, employeeId);
+        // -------------
         return repo.findByEmployeeId(employeeId);
     }
 
     public Contract uploadContract(Account acc, String employeeId, MultipartFile file) throws IOException {
 
-        AccessControlUtil.checkViewOrDownload(acc, employeeId);
+        // AccessControlUtil.checkViewOrDownload(acc, employeeId);
 
+        //-------------
+        //A08 – Software & Data Integrity Failures
+        //-------------
         if (file.isEmpty()) throw new RuntimeException("File rỗng");
 
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
             throw new RuntimeException("Chỉ cho phép file PDF");
         }
+        //-------------safe:1
 
         String dir = "uploads/contracts/" + employeeId;
         String path = dir + "/" + filename;
@@ -69,7 +77,12 @@ public class ContractService {
         Contract c = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract không tồn tại"));
 
+        //-------------
+        //A01 – Broken Access Control 
+        // -------------
         AccessControlUtil.checkViewOrDownload(acc, c.getEmployeeId());
+        // -------------
+
 
         File file = new File(c.getFilePath());
         if (!file.exists()) throw new RuntimeException("File không tồn tại");

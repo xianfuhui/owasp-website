@@ -202,7 +202,7 @@
         </div>
 
         <!-- Upload Section (Admin only) -->
-        <div class="upload-section" sec:authorize="hasRole('ADMIN')">
+        <div class="upload-section" sec:authorize="hasAnyRole('ADMIN', 'HR')">
             <h3>
                 <img th:src="@{/icons/upload.svg}" alt="" class="icon">
                 <span>Tải lên hợp đồng mới</span>
@@ -256,7 +256,7 @@
                             <span>Tải</span>
                         </a>
                         <button 
-                            sec:authorize="hasRole('ADMIN')"
+                            sec:authorize="hasAnyRole('ADMIN', 'HR')"
                             onclick="confirmDelete(this)"
                             th:data-url="@{'/contracts/delete/' + ${c.id}}"
                             class="btn btn-sm btn-danger"

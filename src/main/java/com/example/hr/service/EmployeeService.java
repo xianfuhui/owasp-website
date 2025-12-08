@@ -34,22 +34,24 @@ public class EmployeeService {
         return repo.save(emp);
     }
 
-    public Employee update(String id, Employee newData, String role) {
-        Optional<Employee> optional = repo.findById(id);
+    public Employee update(String oldId, Employee newData) {
+        Optional<Employee> optional = repo.findById(oldId);
         if (!optional.isPresent()) return null;
 
-        Employee emp = optional.get();
+        repo.deleteById(oldId);
 
-        emp.setFullName(newData.getFullName());
-        emp.setEmail(newData.getEmail());
-        emp.setPhone(newData.getPhone());
-        emp.setPosition(newData.getPosition());
-        emp.setSalary(newData.getSalary());
+        Employee newEmployee = new Employee();
+        newEmployee.setId(newData.getId());
+        newEmployee.setFullName(newData.getFullName());
+        newEmployee.setEmail(newData.getEmail());
+        newEmployee.setPhone(newData.getPhone());
+        newEmployee.setPosition(newData.getPosition());
+        newEmployee.setSalary(newData.getSalary());
+        newEmployee.setAvatarPath(newData.getAvatarPath());
 
-        Employee updated = repo.save(emp);
-
-        return updated;
+        return repo.save(newEmployee);
     }
+
 
     public boolean delete(String id) {
         if (!repo.existsById(id)) return false;

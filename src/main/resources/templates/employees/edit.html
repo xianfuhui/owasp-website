@@ -100,10 +100,21 @@
 
         <div class="card form-card">
             <form th:action="@{/employees/edit/{id}(id=${employee.id})}" th:object="${employee}" method="post">
-                <input type="hidden" th:if="${employee.accountId != null}" th:field="*{accountId}" />
 
                 <div class="form-section">
                     <h2 class="form-section-title">Thông tin cá nhân</h2>
+
+                    <div class="form-group">
+                        <label for="id" class="form-label required">ID</label>
+                        <input 
+                            type="text" 
+                            id="id"
+                            th:field="*{id}" 
+                            class="form-control" 
+                            placeholder="Nhập id của nhân viên"
+                            required
+                        />
+                    </div>
 
                     <div class="form-group">
                         <label for="fullName" class="form-label required">Họ và tên</label>
@@ -195,26 +206,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h2 class="form-section-title">Phân quyền tài khoản</h2>
-
-                    <div class="form-group">
-                        <label for="role" class="form-label required">Vai trò</label>
-                        <div style="position: relative;">
-                            <img th:src="@{/icons/settings.svg}" alt="" class="icon icon-sm" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary); z-index: 1;">
-                            <select name="role" id="role" class="form-control" style="padding-left: 3rem;" required>
-                                <option value="">Chọn vai trò...</option>
-                                <option th:each="r : ${roles}"
-                                        th:value="${r}"
-                                        th:text="${r}"
-                                        th:selected="${account != null} ? ${r.equals(account.role)} : false">
-                                </option>
-                            </select>
-                        </div>
-                        <span class="form-help">Chọn quyền truy cập cho tài khoản của nhân viên</span>
                     </div>
                 </div>
 

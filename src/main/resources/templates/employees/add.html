@@ -104,6 +104,19 @@
                     <h2 class="form-section-title">Thông tin cá nhân</h2>
 
                     <div class="form-group">
+                        <label for="fullName" class="form-label required">ID</label>
+                        <input 
+                            type="text" 
+                            id="id"
+                            th:field="*{id}" 
+                            class="form-control" 
+                            placeholder="Nhập id nhân viên"
+                            required
+                        />
+                        <span class="form-help">Vui lòng nhập id của nhân viên</span>
+                    </div>
+
+                    <div class="form-group">
                         <label for="fullName" class="form-label required">Họ và tên</label>
                         <input 
                             type="text" 

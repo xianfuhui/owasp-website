@@ -8,12 +8,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     //-------------
-    //A01 – Broken Access Control
-    //-------------
+    //A05 – Security Misconfiguration
+    // -------------
     // @Override
     // public void addResourceHandlers(ResourceHandlerRegistry registry) {
     //     registry.addResourceHandler("/uploads/**")
     //             .addResourceLocations("file:uploads/");
     // }
-    //-------------
+    //-------------safe:0
 }
