@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +92,8 @@ public class ContractController {
         @PostMapping("/upload/{employeeId}")
         public String uploadContract(
                         @PathVariable String employeeId,
-                        @RequestParam("file") MultipartFile file) throws IOException {
+                        @RequestParam("file") MultipartFile file,
+                        RedirectAttributes redirectAttributes) {
 
                 String username = SecurityUtil.getCurrentUsername();
                 logger.info("[ACTION=UPLOAD] user={} targetEmployee={} filename={} size={}",
@@ -99,10 +101,22 @@ public class ContractController {
 
                 Account currentAccount = accountService.getByUsername(username);
 
-                Contract saved = contractService.uploadContract(currentAccount, employeeId, file);
+                try {
+                        Contract saved = contractService.uploadContract(currentAccount, employeeId, file);
 
-                logger.info("[RESULT=UPLOAD_SUCCESS] user={} employeeId={} savedPath={}",
-                                username, employeeId, saved.getFilePath());
+                        logger.info("[RESULT=UPLOAD_SUCCESS] user={} employeeId={} savedPath={}",
+                                        username, employeeId, saved.getFilePath());
+
+                        redirectAttributes.addFlashAttribute("successMessage", "Upload thành công!");
+                        return "redirect:/contracts/list/" + employeeId;
+
+                } catch (IOException e) {
+                        logger.error("[ERROR=UPLOAD_FAILED] IOException", e);
+                        redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu file: " + e.getMessage());
+                } catch (RuntimeException e) {
+                        logger.warn("[ERROR=UPLOAD_FAILED] RuntimeException", e);
+                        redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+                }
 
                 return "redirect:/contracts/list/" + employeeId;
         }
