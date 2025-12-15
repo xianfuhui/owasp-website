@@ -84,11 +84,10 @@ public class AccountController {
 
         try {
             accountService.create(acc);
-            logger.info("CREATE | Created account for employee: {} by {}", employeeId, username);
+            logger.info("[ACTION=CREATE_ACCOUNT] employeeId={} user={}", employeeId, username);
             model.addAttribute("successMessage", "Tạo tài khoản thành công cho nhân viên: " + employeeId);
         } catch (RuntimeException e) {
-            logger.error("CREATE FAILED | Failed to create account for employee: {} by {}. Error={}",
-                    employeeId, username, e.getMessage());
+            logger.error("[ERROR=CREATE_ACCOUNT] employeeId={} user={} Error={}", employeeId, username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
@@ -132,10 +131,10 @@ public class AccountController {
             acc.setRole(role);
             accountService.update(id, acc);
 
-            logger.info("UPDATE | Account {} updated by {}. Changes: {}", id, username, changes);
+            logger.info("[ACTION=UPDATE_ACCOUNT] id={} user={} changes={}", id, username, changes);
             model.addAttribute("successMessage", "Cập nhật tài khoản thành công. Thay đổi: " + changes);
         } catch (RuntimeException e) {
-            logger.error("UPDATE FAILED | Account {} update by {} failed. Error={}", id, username, e.getMessage());
+            logger.error("[ERROR=UPDATE_ACCOUNT] id={} user={} Error={}", id, username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
@@ -150,10 +149,10 @@ public class AccountController {
         String username = SecurityUtil.getCurrentUsername();
         try {
             accountService.delete(id);
-            logger.info("DELETE | Deleted account {} by {}", id, username);
+            logger.info("[ACTION=DELETE_ACCOUNT] id={} user={}", id, username);
             model.addAttribute("successMessage", "Xóa tài khoản thành công!");
         } catch (RuntimeException e) {
-            logger.error("DELETE FAILED | Account {} deletion by {} failed. Error={}", id, username, e.getMessage());
+            logger.error("[ERROR=DELETE_ACCOUNT] id={} user={} Error={}", id, username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
@@ -201,14 +200,14 @@ public class AccountController {
 
             String result = accountService.changePassword(username, oldPassword, newPassword);
             if (result.contains("thành công")) {
-                logger.info("PASSWORD | {} changed password successfully", username);
+                logger.info("[ACTION=CHANGE_PASSWORD] user={}", username);
                 model.addAttribute("successMessage", result);
             } else {
                 throw new RuntimeException(result);
             }
 
         } catch (RuntimeException e) {
-            logger.error("PASSWORD FAILED | {} failed to change password. Error={}", username, e.getMessage());
+            logger.error("[ERROR=CHANGE_PASSWORD] user={} Error={}", username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 

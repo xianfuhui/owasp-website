@@ -27,25 +27,23 @@ public class ContractService {
         //-------------
         //A01 – Broken Access Control 
         // -------------
-        AccessControlUtil.checkViewOrDownload(acc, employeeId);
+        // AccessControlUtil.checkViewOrDownload(acc, employeeId);
         // -------------
         return repo.findByEmployeeId(employeeId);
     }
 
     public Contract uploadContract(Account acc, String employeeId, MultipartFile file) throws IOException {
-
-        // AccessControlUtil.checkViewOrDownload(acc, employeeId);
-
-        //-------------
-        //A08 – Software & Data Integrity Failures
-        //-------------
         if (file.isEmpty()) throw new RuntimeException("File rỗng");
 
         String filename = file.getOriginalFilename();
-        if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
-            throw new RuntimeException("Chỉ cho phép file PDF");
-        }
-        //-------------safe:1
+
+        //-------------
+        // A08 – Software & Data Integrity Failure
+        //-------------
+        // if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
+        //     throw new RuntimeException("Chỉ cho phép file PDF");
+        // }
+        //-------------
 
         String dir = "uploads/contracts/" + employeeId;
         String path = dir + "/" + filename;
@@ -80,7 +78,7 @@ public class ContractService {
         //-------------
         //A01 – Broken Access Control 
         // -------------
-        AccessControlUtil.checkViewOrDownload(acc, c.getEmployeeId());
+        // AccessControlUtil.checkViewOrDownload(acc, c.getEmployeeId());
         // -------------
 
 

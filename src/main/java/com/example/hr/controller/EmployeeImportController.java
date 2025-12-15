@@ -34,28 +34,28 @@ public class EmployeeImportController {
     public String importExcel(@RequestParam("file") MultipartFile file, Model model) {
         if (file.isEmpty()) {
             model.addAttribute("errorMessage", "File rỗng, vui lòng chọn file Excel.");
-            log.warn("Import failed: empty file uploaded");
+            log.warn("[ERROR=IMPORT_EMPLOYEES] empty file uploaded");
             return "employees/import";
         }
 
         if (!file.getOriginalFilename().toLowerCase().endsWith(".xlsx")) {
             model.addAttribute("errorMessage", "Định dạng file không hợp lệ. Chỉ nhận .xlsx");
-            log.warn("Invalid Excel format: {}", file.getOriginalFilename());
+            log.warn("[ERROR=IMPORT_EMPLOYEES] invalid format file={}", file.getOriginalFilename());
             return "employees/import";
         }
 
         try {
-            log.info("Start importing Excel file: {}", file.getOriginalFilename());
+            log.info("[ACTION=IMPORT_EMPLOYEES] start file={}", file.getOriginalFilename());
 
             List<Employee> imported = importService.importFromExcel(file.getInputStream());
 
-            log.info("Excel import completed. Total employees imported: {}", imported.size());
+            log.info("[RESULT=IMPORT_EMPLOYEES] imported={}", imported.size());
 
             model.addAttribute("successMessage", "Import thành công " + imported.size() + " nhân viên!");
             model.addAttribute("imported", imported);
 
         } catch (Exception e) {
-            log.error("Import failed: {}", e.getMessage(), e);
+            log.error("[ERROR=IMPORT_EMPLOYEES] import failed: {}", e.getMessage());
             model.addAttribute("errorMessage", "Import thất bại: " + e.getMessage());
         }
 

@@ -37,19 +37,19 @@ public class AvatarController {
 
         String username = SecurityUtil.getCurrentUsername();
 
-        logger.info("User {} requested avatar upload for employeeId={} with URL={}",
+        logger.info("[ACTION=UPLOAD_AVATAR] user={} employeeId={} url={}",
                 username, employeeId, imageUrl);
 
         try {
-            String result = avatarService.uploadFromUrl(employeeId, imageUrl);
+            String result = avatarService.uploadFromUrlvulnerable(employeeId, imageUrl);
 
-            logger.info("Avatar upload SUCCESS for employeeId={} by {}", employeeId, username);
+            logger.info("[RESULT=UPLOAD_AVATAR] employeeId={} user={}", employeeId, username);
 
             model.addAttribute("successMessage", result);
 
         } catch (Exception e) {
 
-            logger.error("Avatar upload FAILED for employeeId={} by {}. Error={}", 
+            logger.error("[ERROR=UPLOAD_AVATAR] employeeId={} user={} Error={}", 
                     employeeId, username, e.getMessage());
 
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());

@@ -29,7 +29,7 @@ public class SecurityConfig {
                 // .requiresChannel(channel ->
                 //         channel.anyRequest().requiresSecure()
                 // )
-                //-------------safe:1
+                //-------------
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/internal/config").permitAll()
                                 .requestMatchers("/login").permitAll()
@@ -41,7 +41,7 @@ public class SecurityConfig {
                                 //-------------
                                 //A04 – Insecure Design
                                 //-------------
-                                .requestMatchers("/accounts/**").hasRole("ADMIN")
+                                // .requestMatchers("/accounts/**").hasRole("ADMIN")
                                 //-------------
                                 .anyRequest().authenticated());
                                 
@@ -53,22 +53,22 @@ public class SecurityConfig {
                                 //-------------
                                 //A07 – Authentication Failures
                                 //-------------
-                                .failureHandler((req, res, ex) -> {
-                                        String username = req.getParameter("username");
+                                // .failureHandler((req, res, ex) -> {
+                                //         String username = req.getParameter("username");
 
-                                        if (ex.getCause() instanceof LockedException) {
-                                                res.sendRedirect("/login?locked=true");
-                                                return;
-                                        }
+                                //         if (ex.getCause() instanceof LockedException) {
+                                //                 res.sendRedirect("/login?locked=true");
+                                //                 return;
+                                //         }
 
-                                        if (ex instanceof BadCredentialsException) {
-                                                accountService.recordFailedAttempt(username);
-                                                res.sendRedirect("/login?badpass=true");
-                                                return;
-                                        }
+                                //         if (ex instanceof BadCredentialsException) {
+                                //                 accountService.recordFailedAttempt(username);
+                                //                 res.sendRedirect("/login?badpass=true");
+                                //                 return;
+                                //         }
 
-                                        res.sendRedirect("/login?error=true");
-                                })
+                                //         res.sendRedirect("/login?error=true");
+                                // })
                                 //-------------
                                 .successHandler((req, res, auth) -> {
                                         accountService.resetAttempts(auth.getName());

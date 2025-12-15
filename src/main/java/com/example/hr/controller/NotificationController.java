@@ -44,7 +44,7 @@ public class NotificationController {
         String username = SecurityUtil.getCurrentUsername();
 
         if (subject == null || subject.isBlank() || message == null || message.isBlank()) {
-            log.warn("[MAIL] '{}' failed: missing subject or message", username);
+            log.warn("[ERROR=SEND_MAIL] user={} missing subject or message", username);
             model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ subject và message");
             return "notifications/send-mail";
         }
@@ -55,7 +55,7 @@ public class NotificationController {
             switch (sendOption) {
                 case "all":
                     List<Employee> employees = employeeService.getAll();
-                    log.info("[MAIL] '{}' sending to ALL employees. Total recipients={}", username, employees.size());
+                    log.info("[ACTION=SEND_MAIL_ALL] user={} recipients={}", username, employees.size());
                     result = service.sendMailToAll(employees, subject, message);
                     break;
 
@@ -83,10 +83,10 @@ public class NotificationController {
                 model.addAttribute("successMessage", result);
             }
 
-            log.info("[MAIL] '{}' mail action result: {}", username, result);
+            log.info("[ACTION=SEND_MAIL_RESULT] user={} result={}", username, result);
 
         } catch (Exception e) {
-            log.error("[MAIL] '{}' ERROR during sending mail: {}", username, e.getMessage(), e);
+            log.error("[ERROR=SEND_MAIL] user={} Error={}", username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi khi gửi mail: " + e.getMessage());
         }
 

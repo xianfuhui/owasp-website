@@ -111,10 +111,10 @@ public class ContractController {
                         return "redirect:/contracts/list/" + employeeId;
 
                 } catch (IOException e) {
-                        logger.error("[ERROR=UPLOAD_FAILED] IOException", e);
+                        logger.error("[ERROR=UPLOAD_FAILED] user={} employeeId={} IOException: {}", username, employeeId, e.getMessage());
                         redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu file: " + e.getMessage());
                 } catch (RuntimeException e) {
-                        logger.warn("[ERROR=UPLOAD_FAILED] RuntimeException", e);
+                        logger.warn("[ERROR=UPLOAD_FAILED] user={} employeeId={} RuntimeException: {}", username, employeeId, e.getMessage());
                         redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
                 }
 

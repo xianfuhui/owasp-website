@@ -56,12 +56,12 @@ public class EmployeeController {
     @GetMapping("/list")
     public String list(Model model) {
         String user = SecurityUtil.getCurrentUsername();
-        logger.info("User {} requested employee list", user);
+        logger.info("[ACTION=LIST_EMPLOYEES] user={}", user);
 
         try {
             model.addAttribute("employees", service.getAll());
         } catch (RuntimeException e) {
-            logger.error("Error listing employees by {}: {}", user, e.getMessage());
+            logger.error("[ERROR=LIST_EMPLOYEES] user={} Error={}", user, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
@@ -79,10 +79,10 @@ public class EmployeeController {
         String user = SecurityUtil.getCurrentUsername();
         try {
             Employee created = service.create(emp);
-            logger.info("Employee {} created by {}", created.getId(), user);
+            logger.info("[ACTION=CREATE_EMPLOYEE] id={} user={}", created.getId(), user);
             model.addAttribute("successMessage", "Tạo nhân viên thành công!");
         } catch (RuntimeException e) {
-            logger.error("Error creating employee by {}: {}", user, e.getMessage());
+            logger.error("[ERROR=CREATE_EMPLOYEE] user={} Error={}", user, e.getMessage());
             model.addAttribute("employee", emp);
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "employees/add";
@@ -101,7 +101,7 @@ public class EmployeeController {
             model.addAttribute("employee", emp);
             model.addAttribute("roles", List.of("EMPLOYEE", "HR", "ADMIN"));
         } catch (RuntimeException e) {
-            logger.error("Error opening edit form for employee {} by {}: {}", id, user, e.getMessage());
+            logger.error("[ERROR=OPEN_EDIT_EMPLOYEE] id={} user={} Error={}", id, user, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/employees/list";
         }
@@ -122,10 +122,10 @@ public class EmployeeController {
             String changes = diff(oldEmp, emp);
             service.update(id, emp);
 
-            logger.info("Employee {} updated by {}. Changes: {}", id, user, changes);
+            logger.info("[ACTION=UPDATE_EMPLOYEE] id={} user={} changes={}", id, user, changes);
             model.addAttribute("successMessage", "Cập nhật nhân viên thành công!");
         } catch (RuntimeException e) {
-            logger.error("Error updating employee {} by {}: {}", id, user, e.getMessage());
+            logger.error("[ERROR=UPDATE_EMPLOYEE] id={} user={} Error={}", id, user, e.getMessage());
             model.addAttribute("employee", emp);
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "employees/edit";
@@ -141,10 +141,10 @@ public class EmployeeController {
             boolean deleted = service.delete(id);
             if (!deleted) throw new RuntimeException("Nhân viên không tồn tại");
 
-            logger.info("Employee {} deleted by {}", id, user);
+            logger.info("[ACTION=DELETE_EMPLOYEE] id={} user={}", id, user);
             model.addAttribute("successMessage", "Xóa nhân viên thành công!");
         } catch (RuntimeException e) {
-            logger.error("Error deleting employee {} by {}: {}", id, user, e.getMessage());
+            logger.error("[ERROR=DELETE_EMPLOYEE] id={} user={} Error={}", id, user, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
@@ -158,7 +158,7 @@ public class EmployeeController {
             Account currentAccount = accountService.getByUsername(username);
             //-------------
             //A01 – Broken Access Control 
-            AccessControlUtil.checkViewOrDownload(currentAccount, id);
+            // AccessControlUtil.checkViewOrDownload(currentAccount, id);
             // -------------
 
             Employee emp = service.getById(id);
@@ -166,7 +166,7 @@ public class EmployeeController {
 
             model.addAttribute("employee", emp);
         } catch (RuntimeException e) {
-            logger.error("Error viewing employee {} by {}: {}", id, username, e.getMessage());
+            logger.error("[ERROR=VIEW_EMPLOYEE] id={} user={} Error={}", id, username, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/employees/list";
         }
@@ -190,7 +190,7 @@ public class EmployeeController {
             model.addAttribute("employee", emp);
 
         } catch (RuntimeException e) {
-            logger.error("Error viewing current employee info for {}: {}", user.getUsername(), e.getMessage());
+            logger.error("[ERROR=VIEW_CURRENT_EMPLOYEE] user={} Error={}", user.getUsername(), e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/employees/list";
         }
@@ -211,7 +211,7 @@ public class EmployeeController {
             model.addAttribute("accounts", accs);
             model.addAttribute("currentAccount", accountService.getByUsername(SecurityUtil.getCurrentUsername()));
         } catch (RuntimeException e) {
-            logger.error("Error fetching accounts for employee {} by {}: {}", employeeId, user, e.getMessage());
+            logger.error("[ERROR=FETCH_ACCOUNTS] employeeId={} user={} Error={}", employeeId, user, e.getMessage());
             model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/employees/list";
         }
