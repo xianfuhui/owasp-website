@@ -4,7 +4,7 @@
   },
   "employeeId": "emp000",
   "username": "admin",
-  "password": "$2a$10$7ypGIiyk/muwntsEmGxKzulNrHSVE5tVF14R1HuFe218KS7VP.ntG",
+  "password": "$2a$10$l8MQb5cUvB.UzrSSaDhCberZKjswyLepmptyIxpk3J/fcEDnmQ8C2",
   "role": "ADMIN",
   "failedAttempts": 0,
   "locked": false,
