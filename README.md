@@ -25,7 +25,8 @@ Website OWASP SAFE:
 **Frontend**
 - Thymeleaf
 - JavaScript
-- HTML / CSS
+- HTML
+- CSS
 
 **Database**
 - MongoDB
