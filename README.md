@@ -1,11 +1,11 @@
-# OWASP SAFE HR Management System
+# OWASP Website
 
 ## Introduction
-This project is a Human Resources (HR) management web application developed based on **OWASP Top 10 2021 security practices**.  
+This project is a Human Resources (HR) management web application developed based on OWASP Top 10 2021 security practices.  
 The system is designed to manage employee information and HR-related workflows while focusing on implementing secure web application practices.
 
 The application demonstrates how common web vulnerabilities can be mitigated using secure coding techniques such as authentication control, input validation, and role-based access control.  
-It is intended for **learning, research, and security practice related to web application security**.
+It is intended for learning, research, and security practice related to web application security.
 
 Project repositories:
 
@@ -45,7 +45,19 @@ https://github.com/xianfuhui/owasp-safe-website
 
 ---
 
-## Database Setup (MongoDB)
+## Screenshots
+
+### Home Page
+![Home](images/home.png)
+
+### Feature Page
+![Feature](images/feature.png)
+
+---
+
+## Setup
+
+Run Spring Boot
 
 Upload the following data files into MongoDB:
 
