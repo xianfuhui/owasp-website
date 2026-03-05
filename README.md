@@ -1,82 +1,59 @@
-OWASP Website
+# OWASP SAFE HR Management System
 
-------------------------------------------------------------------------
+## Introduction
+This project is a Human Resources (HR) management web application developed based on **OWASP Top 10 2021 security practices**.  
+The system is designed to manage employee information and HR-related workflows while focusing on implementing secure web application practices.
 
-Introduction
+The application demonstrates how common web vulnerabilities can be mitigated using secure coding techniques such as authentication control, input validation, and role-based access control.  
+It is intended for **learning, research, and security practice related to web application security**.
 
-This project is a Human Resources (HR) management web application
-designed with a strong focus on security. It is developed following
-OWASP Top 10 (2021) security practices. The system manages employee
-information and HR workflows while implementing protections against
-common web vulnerabilities.
+Project repositories:
 
-The application emphasizes secure authentication, input validation, and
-role‑based access control to protect sensitive HR data. It is intended
-for HR administrators and internal company management.
+Website OWASP:  
+https://github.com/xianfuhui/owasp-website
 
-------------------------------------------------------------------------
+Website OWASP SAFE:  
+https://github.com/xianfuhui/owasp-safe-website
 
-Technologies Used
+---
 
-Backend - Spring Boot
+## Technologies Used
 
-Frontend - Thymeleaf - JavaScript
+**Backend**
+- Spring Boot
 
-Database - MongoDB
+**Frontend**
+- Thymeleaf
+- JavaScript
+- HTML / CSS
 
-Other Tools - OWASP security practices - Git / GitHub
+**Database**
+- MongoDB
 
-------------------------------------------------------------------------
+**Other Tools**
+- MongoDB Compass
+- mongoimport
+- Git / GitHub
 
-Features
+---
 
--   Employee management
--   Secure authentication system
--   Role-based access control (RBAC)
--   Protection against common OWASP Top 10 vulnerabilities
+## Features
+- Employee information management
+- Account management system
+- Role-based access control for administrators
+- Secure authentication and input validation based on OWASP recommendations
 
-------------------------------------------------------------------------
+---
 
-Screenshots
+## Database Setup (MongoDB)
 
-Home Page images/home.png
+Upload the following data files into MongoDB:
 
-Feature Page images/feature.png
+- `hr.accounts.json` → collection: **accounts**
+- `hr.employees.json` → collection: **employees**
 
-------------------------------------------------------------------------
+Example using **mongoimport**:
 
-Database Setup (MongoDB)
-
-Upload the following dataset files into MongoDB:
-
--   hr.accounts.json → collection: accounts
--   hr.employees.json → collection: employees
-
-Example using mongoimport:
-
-mongoimport –jsonArray –db hrdb –collection accounts –file
-hr.accounts.json mongoimport –jsonArray –db hrdb –collection employees
-–file hr.employees.json
-
-------------------------------------------------------------------------
-
-Admin Account
-
-Username: admin
-Password: #Vungoimora00@
-
-------------------------------------------------------------------------
-
-Project Repositories
-
-Website OWASP: https://github.com/xianfuhui/owasp-website
-
-Website OWASP SAFE: https://github.com/xianfuhui/owasp-safe-website
-
-------------------------------------------------------------------------
-
-Author
-
-Name: Tien Phu Huy
-Email: tphuyvvk@gmail.com
-GitHub: xianfuhui
+```bash
+mongoimport --jsonArray --db hrdb --collection accounts --file hr.accounts.json
+mongoimport --jsonArray --db hrdb --collection employees --file hr.employees.json
