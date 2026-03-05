@@ -10,10 +10,10 @@ It is intended for learning, research, and security practice related to web appl
 Project repositories:
 
 Website OWASP:  
-https://github.com/xianfuhui/owasp-website
+[https://github.com/xianfuhui/owasp-website](https://github.com/xianfuhui/owasp-website/tree/main/Safe%20Source)
 
 Website OWASP SAFE:  
-https://github.com/xianfuhui/owasp-safe-website
+[https://github.com/xianfuhui/owasp-safe-website](https://github.com/xianfuhui/owasp-website/tree/main/Unsafe%20Source)
 
 ---
 
