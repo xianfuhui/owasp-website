@@ -53,6 +53,9 @@ https://github.com/xianfuhui/owasp-safe-website
 ### Admin Page
 ![Admin](docs/images/admin.jpg)
 
+### HR Page
+![HR](docs/images/hr.jpg)
+
 ### User Page
 ![User](docs/images/user.jpg)
 
